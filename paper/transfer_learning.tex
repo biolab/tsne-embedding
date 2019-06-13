@@ -135,7 +135,7 @@ p_{j \mid i} \propto \frac{1}{L} \sum_{l=1}^{L} \exp \left ( - \frac{1}{2} \math
 
 An algorithm to embedd new data point to a reference embedding consists of estimating similarities between the point and the reference data and optimizing the position of the data point in the embedding space. Unlike parametric models such as principal component analysis or autoencoders, t-SNE does not define an explicit mapping to embedding space, and embeddings need to be found through loss function optimization.
 
-For each new data point, we first estimate its distance to each of the data instances in the reference data set. We initialize the position of the data point in embedding space to the median embedding position of its $k$ nearest neighbors from the reference data set. While we found the algorithm to be robust to choices of $k$, we use $k=25$ in our experiments.
+For each new data point, we first estimate its distance to each of the data instances in the reference data set. We initialize the position of the data point in embedding space to the median embedding position of its $k$ nearest neighbors from the reference data set. While we found the algorithm to be robust to choices of $k$, we use $k=10$ in our experiments.
 
 We adapt the standard t-SNE formulation from Eqs.~\ref{eq:gaussian_kernel}~and~\ref{eq:cauchy_kernel} with
 
@@ -267,7 +267,7 @@ In principle, our theoretically-grounded embedding of secondary data into the sc
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{figures/optimization_retina.pdf}
-\caption{Comparison of data placement by nearest neighbors approach from Kobak and Berens~\cite{art_of_using_tsne} and optimized placement by our algorithm. {\bf (a)} Data points are placed to the median position of their 25 nearest neighbors in the reference set. {\bf (b)} Point positions are optimized, revealing a different, more dispersed placement that better reflects the variety of cells in the secondary data set.}
+\caption{Comparison of data placement by nearest neighbors approach from Kobak and Berens~\cite{art_of_using_tsne} and optimized placement by our algorithm. {\bf (a)} Data points are placed to the median position of their 10 nearest neighbors in the reference set. {\bf (b)} Point positions are optimized, revealing a different, more dispersed placement that better reflects the variety of cells in the secondary data set.}
 \label{fig:optimization}
 \end{figure}
 
