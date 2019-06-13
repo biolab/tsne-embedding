@@ -44,19 +44,19 @@ Baylor College of Medicine, Houston, TX 77030, USA
 
 Dimensionality reduction techniques, such as t-SNE, can construct informative
 visualizations of high-dimensional data. When working with multiple data sets,
-the straightforward application of these methods often fails, and instead of
+a straightforward application of these methods often fails; instead of
 revealing underlying classes, the resulting visualizations expose
-domain-specific clusters. To circumvent these batch effects, we here propose an
-embedding procedure that takes a t-SNE visualization constructed on reference
-data set and uses it as a scaffold for new embeddings. New, secondary data is
-embedded one data-instance at the time, thus disregarding any interactions
-between data items in the secondary data and implicitly mitigating batch
-effects. We demonstrate the utility of this procedure on analysis of six
+data set-specific clusters. To circumvent these batch effects, we propose an
+embedding procedure that takes a t-SNE visualization constructed on the reference
+data set and uses it as a scaffold for embedding new data. New, secondary data is
+embedded one data-instance at the time. This prevents any interactions
+between data instances in the secondary data and implicitly mitigates batch
+effects. We demonstrate the utility of this approach on analysis of six
 recently published single-cell gene expression data sets containing up to tens
 of thousands of cells and thousands of genes. In these data sets, the batch
 effects were particularly strong as the data comes from different institutions
 and was obtained using different experimental protocols. The visualizations
-constructed by the proposed approach are absent of batch effects, and the cells
+constructed by the proposed approach are cleared of batch effects, and the cells
 from secondary data sets correctly co-cluster with cells from the primary data
 sharing the same cell type.
 
@@ -67,33 +67,34 @@ sharing the same cell type.
 \section{Introduction}
 
 Two-dimensional embeddings and their visualizations may assist in the analysis
-and interpretation of multi-dimensional data. Intuitively, two data instances
+and interpretation of high-dimensional data. Intuitively, two data instances
 should be co-located in the resulting visualization if their multi-dimensional
 profiles are similar. For this task, non-linear local embeddings such as
 t-distributed stochastic neighbor embedding (t-SNE)~\cite{tsne} or uniform
 manifold approximation and projection~\cite{umap} have recently complemented
 traditional data transformation and embedding approaches such as principal
 component analysis (PCA) and multi-dimensional
-scaling~\cite{distill,umap_single_cell}. While useful for visualizing the data
+scaling~\cite{distill,umap_single_cell}. While useful for visualizing data
 from a single coherent source, these methods may encounter problems if the data
 comes from different sources. Here, if executing the dimensionality reduction
-procedures on a merged data, the resulting visualizations would typically
-depict source-specific clusters instead of reveal clusters that are
-semantically enriched, say, with same-type of data instances across different
-sources. This source-specific confounding is often referred to as {\em domain
+procedures on merged data, the resulting visualizations would often
+depict source-specific clusters instead of 
+grouping same classes of data which are shared across different
+sources. This source-specific confounding is commonly referred to as {\em domain
 shift}~\cite{domain_shift}, {\em covariate shift}~\cite{covariate_shift} or
-{\em dataset shift}~\cite{dataset_shift}. In the bioinformatics literature, the
+{\em dataset shift}~\cite{dataset_shift}. In bioinformatics, the
 domain-specific differences are more commonly referred to as {\em batch
 effects}~\cite{cca,mnn,seurat}.
 
-Massive, multi-variate biological data sets typical suffer from source-specific
+Massive, multi-variate biological data sets often suffer from these source-specific
 biases. Consider an example from single-cell genomics, a domain we will focus
 on in this manuscript and that was --- besides current scientific challenges
 --- selected also due to availability and the abundance of recently published
-data. Single-cell data sets may include thousands of cells whose profiles
-consist of tens of thousands of cell-specific gene expressions. Single cell
-studies typically start with the analysis of cell types, where we expect that
-cells of the same type would cluster in two-dimensional data
+data. Single-cell RNA sequencing (scRNA-seq) data sets are the result of isolating RNA molecules from individual cells,
+which serves as an estimate of the expression of cell's genes.
+Single-cell studies, which can exceed thousands of cells and tens of thousands of genes,
+typically start with the analysis of cell types. Here, it is generally expected that
+cells of the same type would cluster together in two-dimensional data
 visualisation~\cite{seurat}. For instance, Fig.~\ref{fig:batch_effect}.a shows
 t-SNE embedded data from mouse brain cells originating from visual
 cortex~\cite{hrvatin2018} and hypothalamus~\cite{chen2017}. The figure reveals
@@ -102,11 +103,11 @@ two regions share the same cell types and --- contrary to the depiction in
 Fig.~\ref{fig:batch_effect}.a --- we would expect the data points from the two
 studies to overlap. Batch effects similarly prohibit the utility of t-SNE in
 the exploration of pancreas cells in Fig.~\ref{fig:batch_effect}.b, which
-renders the data from human cell atlas~\cite{baron2016} and similarly-typed
-cells from diabetic patients~\cite{xin2016}. Just like with data from brain
-cells, pancreas cells cluster first according to the data source, again
-resulting in an uninformative visualization that primarily exposes the batch
-effect.
+renders the data from human cell atlas~\cite{baron2016} and
+related cells from diabetic patients~\cite{xin2016}. Just like with data from brain
+cells, pancreas cells cluster primarily by data source, again
+resulting in an uninformative visualization driven by batch
+effects.
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{figures/batch_effect.pdf}
@@ -119,30 +120,31 @@ source.} \label{fig:batch_effect}
 \end{figure}
 
 Current solutions to embedding the data from various data sources address the
-batch effect problems up-front. The data is typically pre-processed and
-transformed, possibly to the latent space, so that the batch effects are
-removed. The recently proposed procedures for batch-effect removal include
-canonical correlation analysis~\cite{cca} and mutual
+batch effect problems upfront. The data is first preprocessed and
+transformed such that the batch effects are explicitly
+removed. Recently proposed procedures for batch effect removal include
+Canonical correlation analysis~\cite{cca} and Mutual
 nearest-neighbors~\cite{mnn,seurat}. In these works, a proof for the success of
 batch effect removal is a good mixing of cells from different sources in a
 t-SNE visualization. Elimination of batch effects may require aggressive data
 preprocessing which may blur the boundaries between cell types. Another problem
-is also the inclusion of any new data, for which the entire data analysis
-pipeline has to be rerun, usually resulting in different layout and clusters
+is also the inclusion of any new data, for which the entire analysis
+pipeline has to be rerun, potentially resulting in different layout and clusters
 that have little resemblance to original visualization and thus require
 reinterpretation.
 
 We propose a direct solution of rendering t-SNE visualizations that addresses
 batch effects. Our approach considers one of the data sets as a {\em reference}
-and aims to visually classify the cells in the other, {\em secondary data set}.
+and aims to embed the cells from another, {\em secondary data set} to a common low-dimensional space.
 We construct the t-SNE embedding using the reference data set, and then use it
-as a scaffold for the embedding of data points from the secondary data.
-Embedding is performed one data point at a time. Independence of each new
-embedding of data instances from secondary data set causes clustering landscape
-to only depend on a reference scaffold, thus removing data source-driven
+as a scaffold for the embedding of secondary data points.
+A key idea underpinning our approach is that the embedding is performed one data point at a time. 
+Independence of each new
+embedding of data instances from secondary data set causes the clustering landscape
+to only depend on the reference scaffold, implicitly removing data source-driven
 variation. In other words, when including new data, the scaffold inferred from
-the reference data set is kept unchanged and defines the ``gravitational
-field'' to independently embedded each new data item. For example, in
+the reference data set is kept unchanged and defines a ``gravitational
+field'', independently driving the embedding of each new instance. For example, in
 Fig.~\ref{fig:transform_brain}, the cells from visual cortex define the
 scaffold (Fig.~\ref{fig:transform_brain}.a) into which we embed the cells from
 hypothalamus (Fig.~\ref{fig:transform_brain}.b). Unlike in their joint t-SNE
@@ -150,32 +152,29 @@ visualization (Fig.~\ref{fig:batch_effect}.a), the hypothalamus cells are
 dispersed across entire embedding space and their cell type correctly matches
 the prevailing type in reference clusters.
 
-At the core of the proposed solution is a mapping that implements embedding of
-new data to existing t-SNE visualization. In the following, we introduce t-SNE,
-then describe its recently proposed multi-scale extension, and outline our
-algorithm that embeds new data into a previously trained scaffold. While a
+The proposed solution is implemented using a mapping of
+new data to an existing t-SNE visualization. While the 
 utility of such an algorithm was already hinted to in recent
-publication~\cite{art_of_using_tsne}, we here provide its practical and
+publication~\cite{art_of_using_tsne}, we hereby provide its practical and
 theoretically-grounded implementation. Considering the abundance of recent
-publications in batch effect removal, we present surprising evidence that a
-computationally more direct and elegant embedding procedure solves the batch
+publications on batch effect removal, we present surprising evidence that a
+computationally more direct and principled embedding procedure solves the batch
 effects problem when constructing interpretable visualizations from different
 data sources.
 
 
 \section{Methods}
 
-We describe an end-to-end pipeline that uses t-SNE embeddings as a scaffold for
-new data samples, and enables visualisation of data from different sources
+We describe an end-to-end pipeline that uses fixed t-SNE coordinates as a scaffold for
+embedding new (secondary) data, enabling joint visualisation of multiple data sources
 while mitigating batch effects. Our proposed approach starts with t\nobreakdash
--SNE to embedd a reference data set, with the aim of constructing a
+-SNE to embed the reference data set, with the aim of constructing a
 two-dimensional visualisation to facilitate interpretation and cluster
-classification. We regard the resulting two-dimensional embedding as a scaffold
-to which we add samples from the new, secondary data source. Each new sample is
-then placed into the reference embedding and optimized independently using the
-t\nobreakdash -SNE loss function. Independent embedding of each data item from
-a secondary data set disregards any interactions present in that data, and
-prevents forming clusters that would be data-souce specific. Below, we start
+classification. Then, the placement of each new sample is
+optimized independently via the
+t\nobreakdash -SNE loss function. Independent treatment of each data instance from
+a secondary data set disregards any interactions present in that data set, and
+prevents forming clusters that would be specific to the secondary data. Below, we start
 with a summary of t-SNE and its extensions (Sec.~\ref{sec:tsne}, emphasizing
 the notation and relevant parts upon which we base our secondary data embedding
 approach (Sec.~\ref{sec:transfer}).
@@ -183,8 +182,9 @@ approach (Sec.~\ref{sec:transfer}).
 
 \subsection{Data embedding by t-SNE and its extensions\label{sec:tsne}}
 
-The embedding by t-SNE is local and non-linear, tailored to visualisation of
-high dimensional data sets. Given a multi-dimensional data set $\mathbf{X} =
+The non-linear t-SNE embedding emphasizes local similarities between data instances, 
+as it is tailored to visualisation of high dimensional data sets. 
+Given a multi-dimensional data set $\mathbf{X} =
 \left \{ \mathbf{x}_1, \mathbf{x}_2, \dots, \mathbf{x}_N \right \} \in
 \mathbb{R}^D$ where $N$ is the number of samples in the reference data set,
 t-SNE aims to find a low dimensional embedding $\mathbf{Y} = \left \{
@@ -201,7 +201,7 @@ p_{j \mid i} = \frac{\exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf
 \label{eq:gaussian_kernel}
 \end{equation}
 
-\noindent where $\mathcal{D}$ is some distance measure. This is then symmetrized to
+\noindent where $\mathcal{D}$ is a distance measure. This is then symmetrized to
 
 \begin{equation}
 p_{ij} = \frac{p_{j \mid i} + p_{i \mid j}}{2N}.
@@ -225,7 +225,7 @@ H(P_i) = -\sum_i p_{j \mid i} \log_2 (p_{j \mid i}).
 density of the data in the multi-dimensional space.
 
 The similarity between points $\mathbf{y}_i$ and $\mathbf{y}_j$ in the
-embedding space are defined using the $t$-distribution with one degree of
+embedding space is defined using the $t$-distribution with one degree of
 freedom
 
 \begin{equation}
@@ -235,7 +235,7 @@ q_{ij} = \frac{\left ( 1 + || \mathbf{y}_i - \mathbf{y}_j ||^2 \right )^{-1}}
 \label{eq:cauchy_kernel}
 \end{equation}
 
-The data transformation by t-SNE finds an embedding $\mathbf{Y}$ that minimizes
+The t-SNE method finds an embedding $\mathbf{Y}$ that minimizes
 the Kullback-Leibler (KL) divergence between $\mathbf{P}$ and $\mathbf{Q}$,
 
 \begin{equation}
@@ -246,20 +246,20 @@ C = \text{KL}(\mathbf{P} \mid \mid \mathbf{Q}) = \sum_{ij} p_{ij} \log \frac{p_{
 The time complexity needed to evaluate the similarities in
 Eq.~\ref{eq:cauchy_kernel} is $\mathcal{O}(N^2)$, making the applications of
 the algorithm impractical for any reasonably-sized data. To address larger data
-sets, we instead adapt a recent approach for low-rank approximation of
+sets, we adopt a recent approach for low-rank approximation of
 similarity matrix based on polynomial interpolation that reduces the time
 complexity of t-SNE to $\mathcal{O}(N)$. This approximation enables the
-visualization of massive data sets possibly containing millions of data
+visualization of massive data sets, possibly containing millions of data
 points~\cite{fi_tsne}.
 
-The t-SNE embeddings substantially depend on the value of the perplexity
-parameter. The perplexity parameter can be interpreted as the number of
+The resulting embeddings substantially depend on the value of the perplexity
+parameter. Perplexity can be interpreted as the number of
 neighbors for which the distances in the embedding space are preserved. Small
 values of perplexity result in tightly-packed clusters of points and lead to
 ignoring the long-range interactions between clusters. Larger values may result
 in a more globally consistent visualisations, preserving distances on a large
 scale and organizing clusters in a more meaningful way. Larger values of
-perplexity may often result in merging multiple small clusters, thus obscuring
+perplexity can lead to merging of multiple small clusters, thus obscuring
 local aspects of the data~\cite{art_of_using_tsne}.
 
 A trade-off between the local organization and global consistency may be
@@ -279,22 +279,22 @@ $l$. In our experiments, we used a mixture of two Gaussian kernels with
 perplexity values of 50 and 500. We note that a similar formulation of
 multi-scale kernels was proposed in~\cite{art_of_using_tsne}, and we found the
 resulting embeddings are visually very similar to those obtained with the
-approach described above (for brevity, data not shown).
+approach described above (not shown for brevity).
 
 
 \subsection{Adding new data points to reference embedding\label{sec:transfer}}
 
-An algorithm to embedd new data point to a reference embedding consists of
+An algorithm to embed a new data point to a reference embedding consists of
 estimating similarities between the point and the reference data and optimizing
 the position of the data point in the embedding space. Unlike parametric models
 such as principal component analysis or autoencoders, t-SNE does not define an
-explicit mapping to embedding space, and embeddings need to be found through
+explicit mapping to the embedding space, and embeddings need to be found through
 loss function optimization.
 
-For each new data point, we first estimate its distance to each of the data
-instances in the reference data set. We initialize the position of the data
-point in embedding space to the median embedding position of its $k$ nearest
-neighbors from the reference data set. While we found the algorithm to be
+The position of a new data
+point in embedding space is initialized 
+to the median reference embedding position of its $k$ nearest 
+neighbors. While we found the algorithm to be
 robust to choices of $k$, we use $k=10$ in our experiments.
 
 We adapt the standard t-SNE formulation from
@@ -319,8 +319,8 @@ $\mathbf{w}_j$ with respect to the loss (Eq.~\ref{eq:kl_divergence}) are:
 \end{equation}
 
 In the optimization step, we refine point positions using batch gradient
-descent. We use an adaptive learning rate scheme with momentum proposed by
-Jacobs to speed up the convergence~\cite{momentum}. We run gradient descent
+descent. We use an adaptive learning rate scheme with momentum 
+to speed up the convergence, as proposed by Jacobs~\cite{momentum}. We run gradient descent
 with momentum $\alpha$ set to $0.8$ for $250$ iterations, where the
 optimization converged for all cases in our experiments.  The time complexity
 needed to evaluate the gradients in Eq.~\ref{eq:gradient} is $\mathcal{O}(N
@@ -330,32 +330,32 @@ approximation, this is reduced to $\mathcal{O}(N)$.
 Special care must be taken to reduce the learning rate $\eta$ as the default
 value in most implementations ($\eta = 200$) may cause points to ``shoot off''
 from the reference embedding. This phenomenon is caused due to the embedding to
-already defined t-SNE space, where the distances between data points and
+a previously defined t-SNE space, where the distances between data points and
 corresponding gradients of the optimization function may be quite large. When
 running s standard t-SNE, points are initialized and scaled to have variance
 0.0001. The resulting gradients tend to be very small during the initial phase,
-resulting in stable convergence. When embedding new samples, the range of the
+resulting in stable convergence. When embedding new instances, the range of the
 embedding is much larger, resulting in much larger gradients, and the default
 learning rate causes points to move very far from the reference embedding. In
-our experiments, we found that lowering the learning rate to $\eta \sim 0.1$
+our experiments, we found that decreasing the learning rate to $\eta \sim 0.1$
 produces stable solutions. This is especially important when using the
 interpolation-based approximation. Our approach places a grid of interpolation
 points over the embedding space, where the number of grid points is determined
 by the embedding range. Clearly, if even one point ``shoots off'' far from the
 embedding, the number of required grid points escalates, substantially
 increasing the runtime. The reduced learning rate suppresses this issue, and
-does not slow the convergence because of an adaptive learning rate scheme and
-running the optimization for a sufficient number of steps. 
+does not slow the convergence because of an adaptive learning rate scheme, provided
+the optimization is run for a sufficient number of steps. 
 
 \section{Experiments and Discussion}
 
-We apply the proposed transfer learning approach to t-SNE visualizations of
-single-cell data. In single-cell data sets, the data includes the variety of
-cells from specific tissue and characterizes the cells through the expression
-of its genes. In experiments, we considered several recently published data
+We examine the utility of the proposed approach with t-SNE visualizations of
+single-cell data. Data in this realm include a variety of
+cells from specific tissues, and characterize them through gene expression. 
+We considered several recently published data
 sets where cells were annotated with the cell type. Our aim was to construct
-t-SNE visualizations where similarly-typed cells would cluster together,
-despite the differences between data sources. Below, we enlist the data sets,
+t-SNE visualizations where cells of similar types would cluster together,
+despite systematic differences between data sources. Below, we enlist the data sets,
 describe single-cell specific data preprocessing procedures, and display the
 resulting data visualizations. Finally, we discuss the success of the proposed
 approach in alleviating the batch effects.
@@ -388,7 +388,7 @@ Shekhar \etal & & Drop-seq & 27,499 & 5 & 96 \\
 (Hrvatin \etal, Baron \etal, and Macoscko \etal) was used as a reference. In
 all cases, we relied on quality control and annotations from the original
 studies. To facilitate comparisons, the cell annotations were harmonized using
-the cell type annotations from cell ontology~\cite{cell_ontology}. Notice that
+the cell type annotations from Cell ontology~\cite{cell_ontology}. Notice that
 different RNA sequencing protocols were used to estimate gene expressions. We
 here report the number of cell types from each data set retained after
 preprocessing. Single-cell data is sparse, typically containing less than 10\%
@@ -469,8 +469,8 @@ such that
 \sum_g I \left (d_g > \exp \left [ -(m_g - b) \right ] + 0.02 \right ) = \hat{G}.
 \end{equation}
 
-\noindent In our experiments we use $t=0$ and $a=1$.
-
+\noindent In our experiments, we use $t=0$ and proceed with a subset of
+$\hat{G}$ genes.
 
 \subsection{Results and Discussion}
 
@@ -503,7 +503,7 @@ Fig.~\ref{fig:transform_brain}.b, or Figs.~\ref{fig:batch_effect}.b and
 corresponding mapping of secondary data from hypothalamus cells (b). Notice
 that the majority of hypothalamus cells were mapped to their corresponding
 reference cluster. For instance, the astrocyte cells marked with red on the
-right were mapped to an oval cluster of same-typed cells denoted with the same
+right were mapped to an oval cluster of the same type, with cells denoted using the same
 color in the visualization on the left.} \label{fig:transform_brain}
 \end{figure}
 
@@ -528,10 +528,10 @@ colors consistent with the study by Macosko \etal. Notice that Shekhar includes
 cells of only four different types.} \label{fig:transform_retina}
 \end{figure}
 
-There are a few tricks that we use in our procedure for t-SNE embedding of the
+There are additional modifications that we use in the embedding of the
 secondary data set that were proposed recently and enhance the original t-SNE.
-An important one is a multi-scale extension that besides local ordering of the
-data points takes care about global optimization of the cluster placement. For
+An important one is a multi-scale extension that, besides local ordering of the
+data points, globally optimizes the cluster placement. For
 illustration, consider visualizations with standard and multi-scale t-SNE in
 Fig.~\ref{fig:multiscale}. Notice, for instance, that in multi-scale t-SNE
 (Fig.~\ref{fig:multiscale}.b) the clusters with neuron cells are clumped
@@ -575,7 +575,7 @@ application of the nearest neighbors-based procedure. For example, while
 describing a set of tricks for t-SNE, Kobak and Berens~\cite{art_of_using_tsne}
 proposed to position new points into a known embedding by placing them in the
 median position of their 10 nearest neighbors, where the neighborhood was
-estimated in the original data space. Notice that we use this trick as well,
+estimated in the original data space. Notice that we use this approach as well,
 but only for initialization of positions of new data instances that are subject
 to further optimization. In Fig.~\ref{fig:optimization} we demonstrate that
 nearest neighboring-based positioning is insufficient and may yield clumped
@@ -583,7 +583,7 @@ visualizations where the optimal positioning using the t-SNE loss function is
 much more dispersed and rightfully shows a more considerable variation in the
 secondary data. Some data points may also fell into the neighboring space
 between differently typed clusters, while after optimization they typically
-converge closer to same-typed groups.
+converge closer to groups of the same type.
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{figures/optimization_retina.pdf}
@@ -599,9 +599,9 @@ variety of cells in the secondary data set.}
 The proposed method assumes that all cell types from the secondary data set are
 present in the reference. The proposed method would fail to reveal novel cell
 types in the secondary data set, possibly positioning them arbitrarily close to
-unrelated clusters. Procedures such as scmap~\cite{scmap} were recently
+unrelated clusters. Procedures such as Scmap were recently
 proposed to cope with such cases and identify the cells whose type is new and
-not included in the reference. Our procedure does not address such cases, and
+not included in the reference~\cite{scmap}. Our procedure does not address such cases, and
 for scaling-up to a wider collection of cell types relies on emerging
 availability of large collections of the reference data such as those managed
 by Human Cell Atlas initiative~\cite{hca}. 
@@ -616,12 +616,12 @@ our open and extensible t-SNE library for Python.
 
 \section{Conclusion}
 
-Almost all recent publications of single-cell studies start with a
+A large majority of recent publications on single-cell studies start with a
 two-dimensional visualization of the data that exposes the diversity as well as
-different types of cells from the study. While any dimensionality reduction
+different types of cells in the study. While any dimensionality reduction
 technique can be used to render such a visualization, different variants of
 t-SNE are most often used. Due to the ability to explore biological mechanisms
-at the cellular level, single-cell studies are increasingly widespread, and
+at the individual cell level, single-cell studies are increasingly widespread, and
 their publications in the past couple of years are abundant. One of the central
 tasks in single-cell studies is the classification of new cells based on
 finding from previous studies. Such transfer of knowledge is often difficult
