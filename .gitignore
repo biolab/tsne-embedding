@@ -2,3 +2,4 @@
 data/*
 !data/.keep
  .ipynb_checkpoints/
+ __pycache__/
