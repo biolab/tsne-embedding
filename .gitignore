@@ -1,0 +1,4 @@
+.idea/
+data/*
+!data/.keep
+ .ipynb_checkpoints/
