@@ -1,3 +1,4 @@
 *.h5ad
 *.pkl.gz
 .ipynb_checkpoints/
+*.pdf
