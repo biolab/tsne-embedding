@@ -1,5 +1,7 @@
 # Embedding to Reference t-SNE Space Addresses Batch Effects in Single-Cell Classification
 
+![](figures/transform_brain.png)
+
 ## Data
 
 All data used in the notebooks and figures are available at http://file.biolab.si/tsne-embedding/.
