@@ -8,6 +8,7 @@
 \usepackage{amsmath, amssymb}
 \usepackage{multirow}
 \usepackage{booktabs}
+\usepackage{todo}
 
 % Fixup hyphenation
 \hyphenation{cor-res-pon-ding}
@@ -65,6 +66,7 @@ sharing the same cell type.
 
 
 \section{Introduction}
+\label{sec:intro}
 
 Two-dimensional embeddings and their visualizations may assist in the analysis
 and interpretation of high-dimensional data. Intuitively, two data instances
@@ -135,7 +137,9 @@ batch effects. Our approach treats one of the data sets as a {\em reference}
 and aims to embed the cells from another, {\em secondary data set} to a common low-dimensional space.
 We construct a t\nobreakdash -SNE embedding using the reference data set, and then use it
 as a scaffold for the embedding of data points from the secondary data.
-The key idea underpinning our approach is that the embedding is performed one data point at a time.
+The key idea underpinning our approach is that data points are embedded
+independently of one another.
+
 Independence of each new
 embedded data instance from the secondary data set causes the clustering landscape
 to depend only on the reference scaffold, thus removing data source-driven
@@ -476,6 +480,7 @@ such that
 \end{equation}
 
 \subsection{Results and Discussion}
+\label{sec:results}
 
 Figs.~\ref{fig:transform_brain}, \ref{fig:transform_pancreas}, and
 \ref{fig:transform_retina} show the embeddings of the reference data sets and
@@ -491,6 +496,13 @@ other figures as well, but they are not common and constitute less then 5\% of
 the cells (less than  5\% in brain, \%1 in pancreas and \%2 in retina
 secondary data sets).
 
+Additional experiments with embedding secondary datasets from independent
+studies are provided in the accompanying Python notebooks. We embedded brain
+cells from \cite{} to the reference embedding shown in
+Fig.~\ref{fig:transform_brain}.a, and pancreas cells from~\cite{} to reference
+in \ref{fig:transform_pancreas}.a. The conclusions are largely consistent, with the error rates 
+of X\% and Y\%. \todo{Add errors}
+
 Notice that we could simulate the split between reference and secondary data
 sets using one data set only and perform cross-validation, however this type of experiment
 would not incorporate batch effects. We want to remind the reader that handling
@@ -499,6 +511,9 @@ could lead to overly-optimistic results and data visualizations strikingly diffe
 compare the visualisations from Fig.~\ref{fig:batch_effect}.a and
 Fig.~\ref{fig:transform_brain}.b, or Figs.~\ref{fig:batch_effect}.b and
 \ref{fig:transform_pancreas}.b.
+
+
+
 
 \begin{figure}[htb]
 \includegraphics[width=\textwidth]{figures/transform_pancreas.pdf}
@@ -573,7 +588,11 @@ visualizations where the optimal positioning using the t-SNE loss function is
 much more dispersed and rightfully shows a more considerable variation in the
 secondary data. Some data points may also fall into the empty regions
 between different clusters, while after optimization they typically
-move closer to same-typed groups.
+move closer to same-typed groups. While the nearest neighbour-based approach
+always places new data points to their most similar cluster, our proposed
+t-SNE approach can identify extreme outliers and place them far from the
+reference cluster.
+
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{figures/optimization_retina.pdf}
@@ -591,10 +610,15 @@ present in the reference. The proposed method would fail to reveal novel cell
 types in the secondary data set, possibly positioning them arbitrarily close to
 unrelated clusters. Procedures such as scmap were recently
 proposed to cope with such cases and identify the cells whose type is new and
-not included in the reference~\cite{scmap}. Our procedure does not address such cases, and
-for scaling-up to a wider collection of cell types relies on emerging
-availability of large collections of the reference data such as those managed
-by Human Cell Atlas initiative~\cite{hca}. 
+not included in the reference~\cite{scmap}.
+
+Our procedure and the resulting cell landscape are affectected by the asymmetry
+of determining the reference and the secondary datasets. In practice, however,
+newly produced \em secondary \em datasets would be embedded into published and
+annnotated the reference landscapes. Scaling-up to a wider collection of cell
+types is driven by increasingly large collections of data, e.g the Human Cell
+Atlas initiative~\cite{hca}. 
+
 
 \subsection{Implementation\label{sec:implementation}}
 
