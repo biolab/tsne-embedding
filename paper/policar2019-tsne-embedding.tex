@@ -80,7 +80,7 @@ from a single coherent source, these methods may encounter problems
 with multiple data sources. Here, when performing dimensionality reduction on a merged data set, the resulting visualizations would typically
 reveal source-specific clusters instead of grouping data instances of the same class, regardless of data sources. This source-specific confounding is often referred to as {\em domain
 shift}~\cite{domain_shift}, {\em covariate shift}~\cite{covariate_shift} or
-{\em data set shift}~\cite{data set_shift}. In bioinformatics, the
+{\em data set shift}~\cite{dataset_shift}. In bioinformatics, the
 domain-specific differences are more commonly referred to as {\em batch
 effects}~\cite{cca,mnn,seurat}.
 
@@ -204,7 +204,7 @@ two data points in t-SNE is defined as:
 
 \begin{equation}
 p_{j \mid i} = \frac{\exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{x}_j ) / \sigma_i^2 \right )}
-{\sum_{k \neq \i } \exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{x}_k ) / \sigma_i^2 \right )}, \quad p_{i \mid i} = 0
+{\sum_{k \neq i } \exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{x}_k ) / \sigma_i^2 \right )}, \quad p_{i \mid i} = 0
 \label{eq:gaussian_kernel}
 \end{equation}
 
@@ -307,7 +307,7 @@ We adapt the standard t-SNE formulation from
 Eqs.~\ref{eq:gaussian_kernel}~and~\ref{eq:cauchy_kernel} with
 
 \begin{align}
-p_{j \mid i} &= \frac{\exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{v}_j) / \sigma_i^2 \right )}{\sum_{i} \exp \left ( -\frac{1}{2} d(\mathbf{x}_i, \mathbf{v}_j) / \sigma_i^2 \right )}, \\
+p_{j \mid i} &= \frac{\exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{v}_j) / \sigma_i^2 \right )}{\sum_{i} \exp \left ( -\frac{1}{2} \mathcal{D}(\mathbf{x}_i, \mathbf{v}_j) / \sigma_i^2 \right )}, \\
 q_{j \mid i} &= \frac{\left ( 1 + || \mathbf{y}_i - \mathbf{w}_j ||^2 \right )^{-1}}{\sum_{i}\left ( 1 + || \mathbf{y}_i - \mathbf{w}_j ||^2 \right )^{-1}},
 \end{align}
 
@@ -331,7 +331,7 @@ with momentum $\alpha$ of $0.8$ for $250$ iterations, where the
 optimization converged in all our experiments. The time complexity
 needed to evaluate the gradients in Eq.~\ref{eq:gradient} is $\mathcal{O}(N
 \cdot M)$, however, by adapting the same polynomial interpolation based
-approximation, this is reduced to $\mathcal{O}(N)$.
+approximation, this is reduced to $\mathcal{O}(\max \{ N, M \})$.
 
 Special care must be taken to reduce the learning rate $\eta$ as the default
 value in most implementations ($\eta = 200$) may cause points to ``shoot off''
@@ -494,7 +494,7 @@ secondary data sets).
 
 Additional experiments with embedding secondary data sets from independent
 studies are provided in the accompanying Python notebooks. We embedded brain
-cells from \cite{} to the reference embedding shown in
+cells from~\cite{} to the reference embedding shown in
 Fig.~\ref{fig:transform_brain}.a, and pancreas cells from~\cite{} to reference
 in \ref{fig:transform_pancreas}.a. The conclusions are largely consistent, with the error rates 
 of X\% and Y\%. \todo{Add errors}
@@ -578,7 +578,7 @@ proposed positioning new points into a known embedding by placing them in the
 median position of their 10 nearest neighbors, where the neighborhood was
 estimated in the original data space. Notice that we use this approach as well,
 but only for the initialization of positions of new data instances that are
-subject to further optimization. Despite both nearest-neighbours search and
+subject to further optimization. Despite both nearest-neighbors search and
 t-SNE optimization can be computed in linear time, the former dominates the
 runtime (mouse retina example; M reference, N secondary cells, X min N-search,
 Y min optimization). \todo{Add nunmbers}
@@ -588,7 +588,7 @@ in Fig.~\ref{fig:optimization}. It may yield clumped visualizations where the
 optimal positioning using the t-SNE loss function is much more dispersed and
 rightfully shows a more considerable variation in the secondary data. 
 Some points may also fall into the empty regions, while after optimization they typically
-move closer to same-typed groups. While the nearest neighbour-based approach
+move closer to same-typed groups. While the nearest neighbor-based approach
 always places new data points to their most similar cluster, our proposed
 t-SNE approach can identify extreme outliers and place them far from the
 reference cluster.
