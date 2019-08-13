@@ -363,7 +363,7 @@ sets where cells were annotated with the cell type. Our aim was to construct
 t-SNE visualizations where similarly-typed cells would cluster together,
 despite systematic differences between data sources. To that end, we focus
 on comparing different ways of using t-SNE rather than differences to embeddings like PCA or MDS, which
-have been substantially covered before~\todo{Add citation}. 
+have been substantially covered before~\cite{tsne,umap_single_cell}. 
 Below, we list the data sets,
 describe single-cell specific data preprocessing procedures, and display the
 resulting data visualizations. Finally, we discuss the success of the proposed
@@ -494,8 +494,8 @@ secondary data sets).
 
 Additional experiments with embedding secondary data sets from independent
 studies are provided in the accompanying Python notebooks. We embedded brain
-cells from~\cite{} to the reference embedding shown in
-Fig.~\ref{fig:transform_brain}.a, and pancreas cells from~\cite{} to reference
+cells from Zeisel \etal~\cite{zeisel2015} to the reference embedding shown in
+Fig.~\ref{fig:transform_brain}.a, and pancreas cells from Muraro \etal~\cite{muraro2016} to reference
 in \ref{fig:transform_pancreas}.a. The conclusions are largely consistent, with the error rates 
 of X\% and Y\%. \todo{Add errors}
 
