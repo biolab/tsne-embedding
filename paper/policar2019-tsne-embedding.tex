@@ -50,16 +50,15 @@ revealing underlying classes, the resulting visualizations expose
 data set-specific clusters. To circumvent these batch effects, we propose an
 embedding procedure that takes a t-SNE visualization constructed on a reference
 data set and uses it as a scaffold for embedding new data. The new, secondary data is
-embedded one data-point at the time. This prevents any interactions
+embedded one data point at the time. This prevents any interactions
 between instances in the secondary data and implicitly mitigates batch
-effects. We demonstrate the utility of this approach with an analysis of six
-recently published single-cell gene expression data sets containing up to tens
-of thousands of cells and thousands of genes. In these data sets, the batch
-effects are particularly strong as the data comes from different institutions
+effects. We demonstrate the utility of this approach by analyzing six
+recently published single-cell gene expression data sets with up to tens
+of thousands of cells and thousands of genes. The batch
+effects are particularly strong as the used data comes from different institutions
 and was obtained using different experimental protocols. The visualizations
 constructed by our proposed approach are cleared of batch effects, and the cells
-from secondary data sets correctly co-cluster with cells from the primary data
-sharing the same cell type.
+from secondary data sets correctly co-cluster with cells of the same type from the primary data. 
 
 \keywords{Batch effects \and Embedding \and t-SNE \and Visualisation \and Single-Cell Transcriptomics \and Data Integration \and Domain Adaptation.}
 \end{abstract}
@@ -77,22 +76,22 @@ manifold approximation and projection~\cite{umap} have recently complemented
 traditional data transformation and embedding approaches such as principal
 component analysis (PCA) and multi-dimensional
 scaling~\cite{distill,umap_single_cell}. While useful for visualizing data
-from a single coherent source, these methods may encounter problems if the data
-comes from multiple sources. Here, when performing dimensionality reduction on a merged data set, the resulting visualizations would typically
-reveal source-specific clusters instead of grouping data instances of the same class-type, regardless of data sources. This source-specific confounding is often referred to as {\em domain
+from a single coherent source, these methods may encounter problems 
+with multiple data sources. Here, when performing dimensionality reduction on a merged data set, the resulting visualizations would typically
+reveal source-specific clusters instead of grouping data instances of the same class, regardless of data sources. This source-specific confounding is often referred to as {\em domain
 shift}~\cite{domain_shift}, {\em covariate shift}~\cite{covariate_shift} or
-{\em dataset shift}~\cite{dataset_shift}. In bioinformatics, the
+{\em data set shift}~\cite{data set_shift}. In bioinformatics, the
 domain-specific differences are more commonly referred to as {\em batch
 effects}~\cite{cca,mnn,seurat}.
 
-Massive, multi-variate biological data sets often suffer from these source-specific
-biases. Consider an example from single-cell genomics, the domain we will focus
-on in this manuscript and that was --- besides current scientific challenges
---- selected also due to the availability and abundance of recently published
-data. Single-cell RNA sequencing (scRNA-seq) data sets are the result of isolating RNA molecules from individual cells,
+Massive, multi-variate biological data sets often suffer from these
+source-specific biases.  The focus of this work is single-cell genomics, a
+domain that was selected due high biomedical relevance and and abundance of
+recently published data. Single-cell RNA sequencing (scRNA-seq) data sets are
+the result of isolating RNA molecules from individual cells,
 which serve as an estimate of the expression of cell's genes.
-Single-cell studies, which can exceed thousands of cells and tens of thousands of genes,
-typically start with the analysis of cell types. Here, it is generally expected that
+The studies can exceed thousands of cells and tens of thousands of genes,
+and typically start with cell type analysis. Here, it is expected that
 cells of the same type would cluster together in two-dimensional data
 visualisation~\cite{seurat}. For instance, Fig.~\ref{fig:batch_effect}.a shows
 t-SNE embedded data from mouse brain cells originating from the visual
@@ -105,8 +104,7 @@ the exploration of pancreatic cells in Fig.~\ref{fig:batch_effect}.b, which
 renders the data from a pancreatic cell atlas~\cite{baron2016} and similarly-typed
 cells from diabetic patients~\cite{xin2016}. Just like with data from brain
 cells, pancreatic cells cluster primarily by data source, again
-resulting in an uninformative visualization driven by batch
-effect.
+resulting in a visualization driven by batch effects.
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{figures/batch_effect.pdf}
@@ -127,7 +125,7 @@ nearest-neighbors~\cite{mnn,seurat}.
 In these works, batch effects are deemed removed when cells from different sources exhibit good mixing in a t-SNE visualization.
 The elimination of batch effects may require aggressive data
 preprocessing which may blur the boundaries between cell types. Another problem
-is also the inclusion of any new data, for which the entire data analysis
+is also the inclusion of any new data, for which the entire analysis
 pipeline must be rerun, usually resulting in a different layout and clusters
 that have little resemblance to original visualization and thus require
 reinterpretation.
@@ -136,12 +134,11 @@ We propose a direct solution of rendering t-SNE visualizations that addresses
 batch effects. Our approach treats one of the data sets as a {\em reference}
 and aims to embed the cells from another, {\em secondary data set} to a common low-dimensional space.
 We construct a t\nobreakdash -SNE embedding using the reference data set, and then use it
-as a scaffold for the embedding of data points from the secondary data.
-The key idea underpinning our approach is that data points are embedded
+as a scaffold for the embedding of the secondary data.
+The key idea underpinning our approach is that secondary data points are embedded
 independently of one another.
 
-Independence of each new
-embedded data instance from the secondary data set causes the clustering landscape
+Independent embedding of each secondary datum causes the clustering landscape
 to depend only on the reference scaffold, thus removing data source-driven
 variation. In other words, when including new data, the scaffold inferred from
 the reference data set is kept unchanged and defines a ``gravitational
@@ -193,10 +190,10 @@ approach (Sec.~\ref{sec:transfer}).
 
 \subsection{Data embedding by t-SNE and its extensions\label{sec:tsne}}
 
-t-SNE is a local, non-linear dimensionality reduction method, tailored to the visualisation of
-high-dimensional data sets. Given a multi-dimensional data set $\mathbf{X} =
+Local, non-linear dimensionality reduction by t-SNE is performed as follows.
+Given a multi-dimensional data set $\mathbf{X} =
 \left \{ \mathbf{x}_1, \mathbf{x}_2, \dots, \mathbf{x}_N \right \} \in
-\mathbb{R}^D$ where $N$ is the number of samples in the reference data set,
+\mathbb{R}^D$ where $N$ is the number of data points in the reference data set,
 t-SNE aims to find a low dimensional embedding $\mathbf{Y} = \left \{
 \mathbf{y}_1, \mathbf{y}_2, \dots, \mathbf{y}_N \right \} \\\in \mathbb{R}^d$
 where $d \ll D$, such that if points $\mathbf{x}_i$ and $\mathbf{x}_j$ are
@@ -255,8 +252,8 @@ C = \text{KL}(\mathbf{P} \mid \mid \mathbf{Q}) = \sum_{ij} p_{ij} \log \frac{p_{
 
 The time complexity needed to evaluate the similarities in
 Eq.~\ref{eq:cauchy_kernel} is $\mathcal{O}(N^2)$, making the application of
-the algorithm impractical for any reasonably-sized data. To address larger data
-sets, we adopt a recent approach for low-rank approximation of
+the algorithm impractical for large data sets. 
+Hence, we adopt a recent approach for low-rank approximation of
 gradients based on polynomial interpolation which reduces the time
 complexity of t-SNE to $\mathcal{O}(N)$. This approximation enables the
 visualization of massive data sets, possibly containing millions of data
@@ -267,10 +264,9 @@ parameter. Perplexity can be interpreted as the number of
 neighbors for which the distances in the embedding space are preserved. Small
 values of perplexity result in tightly-packed clusters of points and effectively
 ignore the long-range interactions between clusters. Larger values may result
-in a more globally consistent visualisations, preserving distances on a large
-scale and organizing clusters in a more meaningful way. Larger values of
-perplexity can lead to merging of multiple small clusters, thus obscuring
-local aspects of the data~\cite{art_of_using_tsne}.
+in a more globally consistent visualisations --- preserving distances on a large
+scale and organizing clusters in a more meaningful way --- but can lead to merging 
+small clusters and thus obscuring local aspects of the data~\cite{art_of_using_tsne}.
 
 The trade-off between the local organization and global consistency may be
 achieved by replacing the Gaussian kernels in Eq.~\ref{eq:gaussian_kernel} with
@@ -331,7 +327,7 @@ $\mathbf{w}_j$ with respect to the loss (Eq.~\ref{eq:kl_divergence}) are:
 In the optimization step, we refine point positions using batch gradient
 descent. We use an adaptive learning rate scheme with momentum 
 to speed up the convergence, as proposed by Jacobs~\cite{momentum,bh_tsne}. We run gradient descent
-with momentum $\alpha$ set to $0.8$ for $250$ iterations, where the
+with momentum $\alpha$ of $0.8$ for $250$ iterations, where the
 optimization converged in all our experiments. The time complexity
 needed to evaluate the gradients in Eq.~\ref{eq:gradient} is $\mathcal{O}(N
 \cdot M)$, however, by adapting the same polynomial interpolation based
@@ -361,7 +357,7 @@ the optimization is run for a sufficient number of steps.
 
 We apply the proposed approach to t-SNE visualizations of
 single-cell data. Data in this realm include a variety of
-cells from specific tissues, and characterize them through gene expression.
+cells from specific tissues and are characterized through gene expression.
 In our experiments, we considered several recently published data
 sets where cells were annotated with the cell type. Our aim was to construct
 t-SNE visualizations where similarly-typed cells would cluster together,
@@ -379,8 +375,29 @@ approach in alleviating the batch effects.
 We use three pairs of reference and secondary single-cell data sets originating
 from different organisms and tissues. The data in each pair were chosen so that
 the majority of cell types from the secondary data set were included in the
-reference set (Table~\ref{tab:datasets}).
+reference set (Table~\ref{tab:data sets}).
+The cells in the data sets originates from the following three tissues:
 
+\begin{description}
+\item[Mouse brain.] The data set from Hrvatin \etal~\cite{hrvatin2018} contains
+cells from the visual cortex exploring transcriptional changes after exposure
+to light. This was used as a reference for the data from Chen
+\etal~\cite{chen2017}, containing cells from the mouse hypothalamus and
+their reaction to food deprivation. From the secondary data, we removed cells
+with no corresponding types in the reference: tanycytes, ependymal,
+epithelial, and unlabelled cells.
+
+\item[Human pancreas.] The data set from Baron \etal~\cite{baron2016} was
+created as an atlas of pancreatic cell types. We used this set as a reference
+for data from Xin \etal~\cite{xin2016}, who examined transcriptional
+differences between healthy and type 2 diabetic patients.
+
+\item[Mouse retina.] The data set from Macosko \etal~\cite{macosko2015} was
+created as an atlas of mouse retinal cell types. We used this as a reference
+for the data from Shekhar \etal~\cite{shekhar2016}, who built an atlas for retinal bipolar cells.
+\end{description}
+
+\vspace{-3mm}
 \begin{table}[ht]
 \begin{center}
 \setlength\tabcolsep{4pt}
@@ -397,39 +414,15 @@ Shekhar \etal & & Drop-seq & 27,499 & 5 & 96 \\
 \bottomrule
 \end{tabular}
 \end{center}
-\caption{Data sets used in our experiments. In each pair, the first data set
-(Hrvatin \etal, Baron \etal, and Macoscko \etal) was used as a reference. In
-all cases, we relied on the quality control and annotations from the original
-publication. To facilitate comparisons, the cell annotations were harmonized using
-cell type annotations from the cell ontology~\cite{cell_ontology}. Notice that
-different RNA sequencing protocols were used to estimate gene expressions. We
-report the number of cell types from each data set retained after
-preprocessing. Single-cell data is sparse, typically containing less than 10\%
-expressed genes per cell.}
-\label{tab:datasets}
+\caption{Data sets used in our experiments. The first data set in a pair
+(Hrvatin \etal, Baron \etal, and Macoscko \etal) was used as a reference. 
+We relied on the quality control and annotations from the original
+publication and report the humber of cell types after preprocessinng. 
+The cell annotations were made consistent to
+annotations from the Cell Ontology~\cite{cell_ontology}. Notice that
+different RNA sequencing protocols were used to estimate gene expressions.}
+\label{tab:data sets}
 \end{table}
-
-
-The cells in the data sets originates from the following three tissues:
-\begin{description}
-\item[Mouse brain.] The data set from Hrvatin \etal~\cite{hrvatin2018} contains
-cells from the visual cortex exploring transcriptional changes after exposure
-to light. This was used as a reference for the data from Chen
-\etal~\cite{chen2017}, containing various cells from the mouse hypothalamus and
-their reaction to food deprivation. From the secondary data, we removed cells
-with no corresponding types in the reference, namely ependymal cells,
-epithelial cells, tanycytes, and unlabelled cells.
-
-\item[Human pancreas.] The data set from Baron \etal~\cite{baron2016} was
-created as an atlas of pancreatic cell types. We used this set as a reference
-for data from Xin \etal~\cite{xin2016}, who examined transcriptional
-differences between healthy and type 2 diabetic patients.
-
-\item[Mouse retina.] The data set from Macosko \etal~\cite{macosko2015} was
-created as an atlas of mouse retinal cell types. We used this as a reference
-for the data from Shekhar \etal~\cite{shekhar2016}, who built an atlas for
-different types of retinal bipolar cells.
-\end{description}
 
 \subsection{Single-cell data preprocessing pipeline}
 
@@ -443,11 +436,11 @@ multi-scale t-SNE using PCA initialization~\cite{art_of_using_tsne}. Due to
 high-dimensionality of the preprocessed input data we use cosine distance to
 estimate similarities between reference data points~\cite{Domingos2012-CACM}.
 When adding new data points from the secondary data set to the reference embedding,
-we select 1,000 genes present in both data sets and use these to estimate the
-similarities between the secondary data item and reference data points. The
-similarities are estimated using cosine similarity. We note that similarities are
-computed using the raw count matrices. The preprocessing stages are detailed in
-accompanying Python notebooks (Sec.~\ref{sec:implementation}).
+we select 1,000 genes present in both data sets and use the cosine similarity 
+to estimate the similarities between the secondary data item and reference data
+points.  We note that similarities are computed using the raw count matrices.
+The preprocessing stages are detailed in accompanying Python notebooks
+(Sec.~\ref{sec:implementation}).
 
 \subsection{Gene selection\label{sec:gene-selection}}
 
@@ -499,7 +492,7 @@ other figures as well, but they are not common and constitute less then 5\% of
 the cells (less than  5\% in brain, \%1 in pancreas and \%2 in retina
 secondary data sets).
 
-Additional experiments with embedding secondary datasets from independent
+Additional experiments with embedding secondary data sets from independent
 studies are provided in the accompanying Python notebooks. We embedded brain
 cells from \cite{} to the reference embedding shown in
 Fig.~\ref{fig:transform_brain}.a, and pancreas cells from~\cite{} to reference
@@ -588,14 +581,13 @@ but only for the initialization of positions of new data instances that are
 subject to further optimization. Despite both nearest-neighbours search and
 t-SNE optimization can be computed in linear time, the former dominates the
 runtime (mouse retina example; M reference, N secondary cells, X min N-search,
-Y min optimization).
+Y min optimization). \todo{Add nunmbers}
 
 We demonstrate a case where nearest neighbor-based positioning is insufficient
 in Fig.~\ref{fig:optimization}. It may yield clumped visualizations where the
 optimal positioning using the t-SNE loss function is much more dispersed and
 rightfully shows a more considerable variation in the secondary data. 
-Some data points may also fall into the empty regions
-between different clusters, while after optimization they typically
+Some points may also fall into the empty regions, while after optimization they typically
 move closer to same-typed groups. While the nearest neighbour-based approach
 always places new data points to their most similar cluster, our proposed
 t-SNE approach can identify extreme outliers and place them far from the
@@ -620,8 +612,8 @@ unrelated clusters. Procedures such as scmap were recently
 proposed to cope with such cases and identify the cells whose type is new and
 not included in the reference~\cite{scmap}.
 
-Our procedure and the resulting cell landscape are affectected by the asymmetry
-of determining the reference and the secondary datasets. In practice, however,
+Our procedure and the resulting cell landscape are therefore affectected by the asymmetry
+of determining the reference and the secondary data sets. In practice, however,
 newly produced \em secondary \em data would be embedded into published and
 annotated reference landscapes. Scaling-up to a wider collection of cell
 types is driven by increasingly large collections of data, e.g the Human Cell
@@ -639,9 +631,9 @@ our open and extensible t-SNE library for Python.
 \section{Conclusion}
 
 Almost all recent publications of single-cell studies begin with a
-two-dimensional visualization of the data that reveals the cellular diversity containing many 
-different cell-types from the study. While any dimensionality reduction
-technique can be used to render such a visualization, different variants of
+two-dimensional visualization of the data that reveals the cellular diversity. 
+While most dimensionality reduction
+techniques can be used to render such a visualization, different variants of
 t-SNE are most often used. Due to the ability to explore biological mechanisms
 at the individual cell level, single-cell studies are increasingly widespread, and
 their publications in the past couple of years are abundant. One of the central
