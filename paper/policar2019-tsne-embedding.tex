@@ -156,8 +156,8 @@ the prevailing type in reference clusters.
 \begin{figure}[htb]
 \includegraphics[width=\textwidth]{figures/transform_brain.pdf}
 \caption{A two-dimensional embedding of a reference containing brain cells (a) and
-the corresponding mapping of secondary data containing hypothalamic cells (b). Notice
-that the majority of hypothalamic cells were mapped to their corresponding
+the corresponding mapping of secondary data containing hypothalamic cells (b). 
+The majority of hypothalamic cells were mapped to their corresponding
 reference cluster. For instance, astrocyte cells marked with red on the
 right were mapped to an oval cluster of same-typed cells denoted with the same
 color in the visualization on the left.} \label{fig:transform_brain}
@@ -365,7 +365,10 @@ cells from specific tissues, and characterize them through gene expression.
 In our experiments, we considered several recently published data
 sets where cells were annotated with the cell type. Our aim was to construct
 t-SNE visualizations where similarly-typed cells would cluster together,
-despite systematic differences between data sources. Below, we list the data sets,
+despite systematic differences between data sources. To that end, we focus
+on comparing different ways of using t-SNE rather than differences to embeddings like PCA or MDS, which
+have been substantially covered before~\todo{Add citation}. 
+Below, we list the data sets,
 describe single-cell specific data preprocessing procedures, and display the
 resulting data visualizations. Finally, we discuss the success of the proposed
 approach in alleviating the batch effects.
@@ -581,12 +584,17 @@ describing a set of tricks for t-SNE, Kobak and Berens~\cite{art_of_using_tsne}
 proposed positioning new points into a known embedding by placing them in the
 median position of their 10 nearest neighbors, where the neighborhood was
 estimated in the original data space. Notice that we use this approach as well,
-but only for the initialization of positions of new data instances that are subject
-to further optimization. In Fig.~\ref{fig:optimization} we demonstrate that
-nearest neighbor-based positioning is insufficient and may yield clumped
-visualizations where the optimal positioning using the t-SNE loss function is
-much more dispersed and rightfully shows a more considerable variation in the
-secondary data. Some data points may also fall into the empty regions
+but only for the initialization of positions of new data instances that are
+subject to further optimization. Despite both nearest-neighbours search and
+t-SNE optimization can be computed in linear time, the former dominates the
+runtime (mouse retina example; M reference, N secondary cells, X min N-search,
+Y min optimization).
+
+We demonstrate a case where nearest neighbor-based positioning is insufficient
+in Fig.~\ref{fig:optimization}. It may yield clumped visualizations where the
+optimal positioning using the t-SNE loss function is much more dispersed and
+rightfully shows a more considerable variation in the secondary data. 
+Some data points may also fall into the empty regions
 between different clusters, while after optimization they typically
 move closer to same-typed groups. While the nearest neighbour-based approach
 always places new data points to their most similar cluster, our proposed
@@ -614,8 +622,8 @@ not included in the reference~\cite{scmap}.
 
 Our procedure and the resulting cell landscape are affectected by the asymmetry
 of determining the reference and the secondary datasets. In practice, however,
-newly produced \em secondary \em datasets would be embedded into published and
-annnotated the reference landscapes. Scaling-up to a wider collection of cell
+newly produced \em secondary \em data would be embedded into published and
+annotated reference landscapes. Scaling-up to a wider collection of cell
 types is driven by increasingly large collections of data, e.g the Human Cell
 Atlas initiative~\cite{hca}. 
 
