@@ -183,6 +183,18 @@ computationally more direct and principled embedding procedure solves the batch
 effects problem when constructing interpretable visualizations from different
 data sources.
 
+Our contributions are two-fold. 
+\begin{enumerate}
+  \item We introduce a theoretically-grounded extension of the t-SNE
+  visualization algorithm, which allows the embedding of new data points into
+  existing, reference visualizations. Our extension is easily incorporated into
+  existing approximation schemes, enabling it to be applied to large data sets.
+  We show that optimization using the default t-SNE parameters is highly
+  unstable and propose parameter values which lead to stable convergence.
+  \item We show that our straightforward extension can be used to mitigate batch
+  effects in single-cell RNA-seq data.
+\end{enumerate}
+
 
 \section{Related Work}
 

@@ -1,7 +1,7 @@
 % This is samplepaper.tex, a sample chapter demonstrating the
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL diffbase.tex                     Sun Apr 11 11:23:04 2021
-%DIF ADD policar2020-tsne-embedding.tex   Mon Apr 12 12:46:43 2021
+%DIF ADD policar2020-tsne-embedding.tex   Thu May 13 21:44:23 2021
 % LLNCS macro package for Springer Computer Science proceedings;
 % Version 2.20 of 2017/10/04
 %
@@ -320,8 +320,20 @@ computationally more direct and principled embedding procedure solves the batch
 effects problem when constructing interpretable visualizations from different
 data sources.
 
+\DIFaddbegin \DIFadd{Our contributions are two-fold. 
+}\begin{enumerate}
+  \item \DIFadd{We introduce a theoretically-grounded extension of the t-SNE
+  visualization algorithm, which allows the embedding of new data points into
+  existing, reference visualizations. Our extension is easily incorporated into
+  existing approximation schemes, enabling it to be applied to large data sets.
+  We show that optimization using the default t-SNE parameters is highly
+  unstable and propose parameter values which lead to stable convergence.
+  }\item \DIFadd{We show that our straightforward extension can be used to mitigate batch
+  effects in single-cell RNA-seq data.
+}\end{enumerate}
 
-\DIFaddbegin \section{\DIFadd{Related Work}}
+
+\section{\DIFadd{Related Work}}
 
 \DIFadd{Batch effects are systematic biases between biological data sets caused by
 technical factors in the data collection and preparation process. It has been
