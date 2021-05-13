@@ -1,0 +1,274 @@
+\documentclass{article}
+
+
+\usepackage[T1]{fontenc}
+\usepackage{natbib}
+\usepackage{todonotes}
+\usepackage{gensymb}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage[top=1in,bottom=1in,left=1in,right=1in]{geometry}
+\usepackage{alltt}
+\usepackage{framed}
+\usepackage{xcolor}
+\usepackage{comment}
+\usepackage{graphicx}
+
+\usepackage{xr}[]
+\externaldocument{policar2019-tsne-embedding}
+\usepackage{url}
+
+\renewcommand{\thetable}{\Alph{table}}
+\renewcommand{\thefigure}{\Alph{figure}}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqs}{\begin{equation}}
+\newcommand{\eeqs}{\end{equation}}
+\newcommand{\mx}[1]{\ensuremath{\boldsymbol{\mathrm{{#1}}}}}   % Simple matrix format.
+
+
+% \newcommand{\review}[1]{\noindent{{\textbf{\textit{#1}}}}\vspace{3mm}}
+% \definecolor{colframe}{rgb}{0.01,0.199,0.1}
+
+\newcounter{rtaskno}
+\newcommand{\rtask}[1]{\refstepcounter{rtaskno}\label{#1}}
+
+\newcommand{\reviewc}[2]{\begin{leftbar}\noindent\rtask{#1}\ref{#1}. #2\end{leftbar}}
+\newcommand{\review}[1]{\begin{leftbar}\noindent #1\end{leftbar}}
+\newcommand{\answer}[1]{\noindent #1\\[0mm]}
+\newcommand{\copyquote}[1]{\vspace{2mm} {\color{blue} #1}\vspace{2mm}}
+
+\newlength{\leftbarwidth}
+\setlength{\leftbarwidth}{3pt}
+\newlength{\leftbarsep}
+\setlength{\leftbarsep}{10pt}
+\renewenvironment{leftbar}{%
+    \def\FrameCommand{{\color{black}{\vrule width \leftbarwidth\relax\hspace {\leftbarsep}}}}%
+    \MakeFramed {\advance \hsize -\width \FrameRestore }%
+}{\endMakeFramed}
+
+
+% \usepackage[colorlinks=True,citecolor=black]{hyperref}
+
+\begin{document}
+
+
+\noindent{\bf Poli\v{c}ar, Stra\v{z}ar \& Zupan: Embedding to Reference t-SNE Space Addresses Batch Effects in Single-Cell Classification}
+
+\vspace{5mm}
+\noindent {\bf RESPONSE TO THE REVIEWERS}
+
+\vspace{5mm}
+
+
+\noindent Dear Editor and the Reviewers, \\
+ 
+\vspace{3mm}
+
+\noindent we thank for the comprehensive feedback that helped to improve the
+manuscript, sufficient time to implement the changes, and the permission to
+submit a revised version. 
+ 
+\vspace{3mm}
+
+All of the reviewer remarks are addressed below with reference to the
+corresponding changes in the manuscript.  In case of overlapping remarks from
+different reviewers, we refer the reader to the relevant enumerated answer. A
+differential document is provided to facilitate the comparison with the initial
+submission. The changes to the data, code and the instructions to reproduce all
+the experiments are available in the repository:
+\url{https://github.com/biolab/tsne-embedding}.
+
+\vspace{3mm}
+
+\begin{flushright}
+\noindent Kind regards, \\ 
+\vspace{2mm}
+Pavlin Poli\v{c}ar \\
+Martin Stra\v{z}ar \\
+Bla\v{z} Zupan \\ 
+\vspace{2mm}
+University of Ljubljana, Slovenia 
+\end{flushright}
+
+\vspace{10mm}
+
+
+\subsection*{Reviewer \#1}
+
+\reviewc{r1q1}{Most important is to add in theoretical part investigation about which dataset can be a reference dataset. It is necessary because it is crucial in estimation of level of trust worth.
+Some information about it is provided in testing part but only in form of general statement on specific case (based on some data sets), but it is necessary to have a procedure/test when given data set is a good reference data set.}
+
+\answer{
+	We thank the reviewer for this comment and have expanded our discussion of potential failure cases in the ``Experiments and Discussion'' section. We have added an example of a failure case and have pointed out that care must be taken when using our procedure.
+
+	A theoretical investigation of which data set can be used as a reference is beyond the scope of this paper. Conceptually, our approach for classification is very similar to a $k$-nearest neighbor classifier. It would be very difficult to theoretically quantify which reference data sets would be appropriate for such classifiers.
+}
+
+
+\reviewc{r1q2}{Page 1
+Bibliography:
+positions 3 and 4 is not about PCA and MDS. Please provide appropriate citations for PCA and MDS.}
+
+\answer{We thank the reviewer for catching this mistake. We have fixed these citations.}
+
+
+\reviewc{r1q3}{
+Page 6
+How do you select L and $\sigma_{i,l}$?
+}
+
+\answer{
+	This isn't part of our work, and has been moved to the supplement. Refer to the original publication for a thorough comparison. We moved this section to the appendix.
+}
+
+
+\reviewc{r1q4}{page 9
+The "I(.)" in Eq. 11 is not defined.}
+
+\answer{
+	We've added a short sentence, explaining that this is the indicator function. We moved this section to the appendix.
+}
+
+
+\reviewc{r1q5}{Please precise what do you mean by the right side of Eq. 12 (the meaning of brackets and "|").}
+
+\answer{We have modified the text so that the equations in this section are clearer.}
+
+
+\reviewc{r1q6}{Generally subsection 3.3 is not as clear as it should be. Please rewrite it.}
+
+\answer{We agree that this subsection could be more clear. We have modified some parts of it and added sentences which should clarify the gene selection procedure.}
+
+
+\reviewc{r1q7}{Figs 1-4
+It would be much more readable when Figures would be bigger. Please provide subfigures vertically, not horizontally.}
+
+\answer{}
+
+
+\reviewc{r1q8}{GENERAL statement: provide better quality of all Figures (better resolution, now we see large pixels too early...)}
+
+\answer{}
+
+
+\reviewc{r1q9}{Fig 5
+Please modify comparison presented in Fig 5.
+Please provide 4 subfigures:
+- t-SNE without PCA and without multiscale
+- t-SNE with PCA and without multiscale
+- t-SNE without PCA and with multiscale
+- t-SNE with PCA and with multiscale
+only in such case we can be sure what is real source of success.
+It would be fine to see such comparison on (at least) two datasets. (!)}
+
+\answer{
+	This isn't part of our work, and has been moved to the supplement. Refer to the original publication for a thorough compoarison.
+}
+
+
+\reviewc{r1q10}{Fig 6
+Authors claim that in case of sub-figure c all genes may lead to under-clustering but the figures b and c are very similar in the number of clusters.}
+
+\answer{
+	How to select the number of genes is pretty irrelevant to our work. This is a question of single-cell processing pipeline, which we do not care about in this work.
+}
+
+
+\subsection*{Reviewer \#2}
+
+\reviewc{r2q1}{Since the focus, from an application point of view, is on bioinformatics and specifically on batch effects, I think that a more detailed description of this phenomenon should be reported in the introduction. }
+
+\answer{
+	We've addressed this in related work, where we've added a paragraph dedicated to batch effects.
+}
+
+
+\reviewc{r2q2}{The structure of the paper can significantly be improved. In particular:
+
+- A section devoted to the description of related work should be introduced, reporting existing work on both the application and methodological viewpoints. In this respect, some descriptions currently reported in the experiments sections (see, for example, the description of scMap-cluster) should be moved in this section. Moreover, I actually can see a strong similarity with transfer learning methods, specifically with those focusing on domain adaptation. I suggest the authors to consider some relevant recent works in this field in their discussion (see, for example, the survey 10.1186/s40537-016-0043-6), also specifically focusing on bioinformatics (see, for example, the work 10.1093/bioinformatics/btz781).
+
+- Related to the previous comment, some details related to existing approaches should be removed (or strongly simplified) from the section devoted to experiments, and moved to a new section devoted to related work. 
+
+- Some parameter values reported in the methods section should be moved in the experiments, since they are part of the experimental setting.}
+
+\answer{We thank the reviewer for this comment. We have restructured the paper.
+
+	We have added a ``Related work'' section, where we describe batch-effects in more detail. We have also moved the description of scMap-Cluster from the ``Experiments'' section to this section. While it is true that these approaches are, in essence, transfer learning, the data sets produced by single-cell RNA-seq are sufficiently different from data sets from other fields of machine learning that they requires specialized methods, which we describe in the ``Related work'' section.
+}
+
+
+\reviewc{r2q3}{The current paper is an extension of a conference paper submitted to the conference Discovery Science 2019. The authors should explicitly provide in the text the actual novel contributions with respect to the conference version.}
+
+\answer{}
+
+
+\reviewc{r2q4}{The authors should better emphasize the contribution from a methodological viewpoint. Indeed, without a proper emphasis on this aspect, the paper seems to be the application of an existing tool (namely, openTSNE) to a new dataset. If the contribution from a methodological viewpoint is actually limited, the authors should still put some effort in emphasizing the advantages of this approach in this specific domain.}
+
+\answer{
+	We have changed the working in ``Availability and Implementation'' section, which emphasizes that the extension we describe in this paper was developed by us and later incorporated into \textsf{openTSNE}. As this is the only mention of \textsf{openTSNE} in the manuscript, we believe there can be no further confusion in this respect.
+}
+
+
+\reviewc{r2q5}{PCA-based initialization seems to help a lot. I would appreciate to see a comparison of the results with those achievable with the simple application of PCA with just 2 principal components.}
+
+\answer{
+	This isn't part of our work, and has been moved to the supplement. Please, refer to the original publication for a thorough comparison. However, we would also refer the reviewer to a recent comment by Kobak and Linderman ``Initialization is critical for preserving global data structure in both t-SNE and UMAP'', \textit{Nature Biotechnology}, 2021, which demonstrates that good initialization schemes are important for both t-SNE and UMAP.
+}
+
+
+\reviewc{r2q6}{At the beginning of Section 3.2, a quite long preprocessing pipeline is shown. Actually, I would like to understand the underline motivations behind that. Few additional sentences would help in this respect.}
+
+\answer{
+	This is a question of single-cell processing pipeline, which is not the focus of our work. We provide a reference to the original publication presenting the pipeline in the text.
+}
+
+
+\subsection*{Reviewer \#3}
+
+\reviewc{r3q1}{The research heavily relies on the ref. [15]. Although the authors claimed that they provide both practical and theoretical grounded implementation, the contribution in terms of theoretical justification is not convincing enough. The equations, given in Section 2, closely correlate with those provided in [15], except for two small modifications - replacing x and y with v and w. }
+
+\answer{
+	We agree that the original manuscript included sections that are important to the single-cell analysis pipeline which are perhaps not the most relevant to our particular contribution i.e. the extension of t-SNE to allow embedding new data points into existing embeddings. For this particular task, the details of the single-cell analysis are not crucial. While it is true that our single-cell pipeline relies on the work from [15], we have moved most of these sections to the appendix, as they are not directly related to our work. We believe that this improves the readability of our paper. However, the work done in [15] introduced ideas which are now considered standard practice for t-SNE visualizations, so a brief review of the most important concepts is kept in Section 3.1.
+
+	Regarding the contribution in terms of theoretical justification: the extension is indeed very minor, and requires changing only two variables, which results in different interactions being calculated. However, additional minor but important changes need to made, including the omission of the symmetrization step and a minor change in the gradient calculation.
+
+	Perhaps more important is the practical aspect of our work i.e. how do we get this to work. While the equations change only slightly, a straightforward application of our approach using the currently accepted t-SNE parameter settings will result in wildly unstable optimization, so special care must be taken to mitigate this erratic behaviour. We describe this in the last paragraph of Section 3.2, where we emphasize the importance of lowering the learning rate and introducing optimization tricks e.g. gradient clipping. This is especially important for the approximation schemes used today by virtually all t-SNE implementations, as a poor parameter setting will result in points ``shooting-off'' far away from the reference points and will dramatically impact the runtime of these approximation schemes. Without these modifications, the t-SNE transform functionality becomes unusable in virtually all settings.
+}
+
+
+\reviewc{r3q2}{From the Abstract, it is not immediately clear what the reference and secondary datasets are. The authors explained it later in the main body, but it seems reasonable to introduce the terms earlier to keep readers interested. Further, the authors claim that they show "the utility of the proposed approach by analyzing 6 recently published ... datasets … with up to tens of thousands of cells and thousands of genes ..."  and so on. Mentioning more specific quantitative results with regard to particular datasets, in comparison with the known results, would be desirable. }
+
+\answer{
+	We have slightly reworded the abstract to indicate that the secondary data set contains new, unseen points.
+
+	We disagree that mentioning more qualitative results would improve this manuscript. There are no robust, agreed-up baselines in the single-cell literature for batch effect removal in general. Only a handful of methods for cross-data set cell-type classification methods have been proposed, and none of them are directly related to our approach. This manuscript highlights that a simple extension to a visualization technique, t-SNE, performs competitively to specialized machine learning and bioinformatics methods for cell-type classification. These methods are not directly comparable, and our aim is not to improve the accuracy of such approaches. We have, however, reworded the last paragraph of Section 4.6 to emphasize this point.
+}
+
+
+\reviewc{r3q3}{The Results and Discussion section is difficult to follow. Please, if possible, consider splitting it in subsections.}
+
+\answer{
+	We thank the reviewer for this comment and we agree that splitting the section into subsections would improve the readability of the manuscript. We have split up the ``Results and Discussion'' section into several subsections.
+}
+
+
+\reviewc{r3q4}{Consider replacing the legends in Fig. 1 with the names or descriptions of the datasets to increase the readability. }
+
+\answer{
+	The legends of Figure 1 show the names of the data sets, or rather, their original publication. The figure demonstrates that two data sets with shared cell types cluster primarily by data set and not by cell-type. In this instance one would reasonably assume and even hope that the samples would cluster by cell-type and that the data set source would not interfere with the visualization. We feel that a description of the data sets is unnecessary here, as it does not help illustrate our point, and would needlessly burden the reader with biological details.
+}
+
+
+\reviewc{r3q5}{Please extend Section 3.5, which includes only two sentences, with more details of implementation or consider moving this text into Section 3.4 (possibly at the beginning or at the end).}
+
+\answer{We agree that this is not the most suitable location for this information, and we have moved it to the end of the manuscript, after the conclusion and before the acknowledgments, as is standard practice in many journals.}
+
+
+\reviewc{r3q6}{Please update the preprint [15] with the published manuscript.}
+
+\answer{The thank the reviewer for the reminder. We have updated the citation.}
+
+\end{document}

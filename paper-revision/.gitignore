@@ -1,0 +1,11 @@
+diff.pdf
+policar2020-tsne-embedding.pdf
+response-to-reviewers.pdf
+
+*.log
+*.aux
+*.out
+*.bbl
+*.blg
+
+.DS_STORE
