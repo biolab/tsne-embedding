@@ -227,7 +227,7 @@ Current methods broadly fall into two categories:
  dimensionality-reduction methods such as PCA~\cite{Korsunsky2019} or
  MultiCCA~\cite{Butler2018}, while others employ non-linear techniques from
  deep learning~\cite{Li2020,Lopez2018}. Still, other approaches use a
- combination of the two~\cite{Stuart2019,Hie2019}.
+ combination of the two~\cite{Stuart2019,Hie2019}. Note that these approaches bear similarity with transfer learning~\cite{https://journalofbigdata.springeropen.com/articles/10.1186/s40537-016-0043-6}, which has also been used in domain adaptation~\cite{https://jieliu6.github.io/publication/conference-paper/jointly-embedding-multiple-single-cell/}.
 \end{enumerate}
 
 Besides computational techniques, approaches for the removal of batch effects
@@ -360,7 +360,7 @@ p_{j \mid i} \propto \frac{1}{L} \sum_{l=1}^{L} \exp \left ( - \frac{1}{2} \math
 \label{eq:multiscale}
 \end{equation}
 
-\noindent where $L$ is the number of mixture components. The bandwidths
+\noindent where $L$ is the number of mixture components as specified by the user. The bandwidths
 $\sigma_{i,l}$ are selected in the same manner as in
 Eq.~\ref{eq:gaussian_kernel}, but with a different value of perplexity for each
 $l$. In our experiments, we used a mixture of two Gaussian kernels with
@@ -581,6 +581,27 @@ neurons, corresponding to their developmental origin, as discussed in
 Tasic \etal~\cite{Tasic2018}, while this division is less apparent when using
 PCA-based initialization alone in Fig.~\ref{fig:multiscale}.b.
 
+\begin{figure}[htbp]
+  \includegraphics[width=\textwidth]{tasic_multiscale.pdf}
+  \caption{A comparison of standard and multi-scale t-SNE on data from the
+   mouse neocortex~\cite{Tasic2018}. {\bf (a)} Standard t-SNE using random
+   initialization places clusters arbitrarily. The resulting clustering
+   structure is not globally consistent, as clusters of the same type of
+   cells are dispersed throughout the landscape. Non-Neuronal clusters, for
+   instance, are mixed with clusters of GABAergic and Glutamaergic neurons.
+   {\bf (b)} By utilizing a globally consistent initialization for t-SNE, the
+   clusters are organized in a more meaningful layout, where clusters of
+   cells of the same type appear closer together.{\bf (c)} Augmenting t-SNE
+   with multi-scale similarities and using proper initialization provides a
+   more meaningful layout of the clusters. Non-Neuronal and Endothelial cell
+   types are now placed in the same region of the embedding. There are two
+   clear sub-groups of GABAergic neurons corresponding to their developmental
+   origins, which was not as apparent when using clever initialization
+   alone.}
+  \label{fig:multiscale}
+\end{figure}
+
+
 We also observed the important role of gene selection in crafting the
 reference embedding spaces. We found that when selecting an insufficient
 number of genes, the resulting visualizations display overly-fragmented
@@ -588,7 +609,17 @@ clusters. When the selection is too broad and includes lowly expressed genes,
 the subclusters tend to overlap. These effects can all be attributed to
 sparseness of the data sets and may be intrinsic to single-cell data. In our
 studies, we found that selection of 3,000 genes yields most informative
-visualizations(Fig.~\ref{fig:gene_selection}).
+visualizations (Fig.~\ref{fig:gene_selection}).
+
+\begin{figure}[htbp]
+  \includegraphics[width=\textwidth]{hrvatin_embedding_tsne_genes.pdf}
+  \caption{Gene selection plays an important role when constructing the
+  reference embedding. {\bf (a)} Using too few genes results in fragmented
+  clusters. {\bf (b)} Using an intermediate number of genes reveals clustering
+  mostly consistent with cell annotations. {\bf (c)} Including all the genes
+  may lead to under-clustering of the more specialized cell types. In our example, the neuronal subclusters are more clearly defined in (b).}
+  \label{fig:gene_selection}
+\end{figure}
 
 \subsection{Optimization is crucial to producing meaningful point embeddings}
 
@@ -837,35 +868,36 @@ like to thank Dmitry Kobak for many helpful discussions on t-SNE.
 \section{Single-Cell Data Preprocessing Pipeline\label{sec:sc-pipeline}}
 
 Due to the specific nature of single-cell data, additional steps must be taken
-to properly apply t-SNE. We use a standard single-cell preprocessing pipeline,
-consisting of the selection of 3,000 representative genes (see
-Appendix~\ref{sec:gene-selection}), library size normalization,
-log-transformation, standardization, and PCA-based representation that retains
-50 principal components~\cite{Stuart2019,Wolf2018}. To obtain the reference
-embedding, we apply multi-scale t-SNE using PCA initialization~\cite{Kobak2019}.
-Due to high-dimensionality of the preprocessed input data we use cosine distance
-to estimate similarities between reference data points~\cite{Domingos2012}. When
-adding new data points from the secondary data set to the reference embedding,
-we select 1,000 genes present in both data sets and use the cosine similarity to
+to properly apply t-SNE. We use a standard single-cell preprocessing
+pipeline, consisting of the selection of 3,000 representative genes
+(see Appendix~\ref{sec:gene-selection}), library size normalization,
+log-transformation, standardization, and PCA-based representation that
+retains 50 principal components~\cite{Stuart2019,Wolf2018}. To obtain the
+reference embedding, we apply multi-scale t-SNE using PCA
+initialization~\cite{Kobak2019}. Due to high-dimensionality of the
+preprocessed input data we use cosine distance to estimate similarities
+between reference data points~\cite{Domingos2012}. When adding new data
+points from the secondary data set to the reference embedding, we select
+1,000 genes present in both data sets and use the cosine similarity to
 estimate the similarities between the secondary data item and reference data
-points. We note that similarities are computed using the raw count matrices. The
-preprocessing stages are detailed in accompanying Python notebooks
+points. We note that similarities are computed using the raw count matrices.
+The preprocessing stages are detailed in accompanying Python notebooks
 (Sec.~\ref{sec:implementation}).
 
 \section{Gene Selection\label{sec:gene-selection}}
 
-Single-cell data sets suffer from high levels of technical noise and low capture
-efficiency, resulting in sparse and noisy expression matrices~\cite{umi}. A
-common occurrence in these data sets is ``dropout'', where an expressed gene is
-not measured, and its corresponding matrix entry is set to zero. To address this
-problem, we use a specialized feature-selection method, which exploits the
-mean-dropout relationship of expression counts as recently proposed by Kobak and
-Berens~\cite{Kobak2019}. In this context, we will refer to all genes with matrix
-entries set to zero as dropouts. Intuitively, if a gene has high mean expression
-over all cells, but is detected in only a handful of them (i.e. has high mean
-dropout rate), then this gene is likely specific to a specific cell-type and
-will serve as a good feature for any subsequent analysis where we wish to
-discriminate between cell types.
+Single-cell data sets suffer from high levels of technical noise and low
+capture efficiency, resulting in sparse and noisy expression matrices~\cite
+{umi}. A common occurrence in these data sets is ``dropout'', where an
+expressed gene is not measured, and its corresponding matrix entry is set to
+zero. To address this problem, we use a specialized feature-selection method,
+which exploits the mean-dropout relationship of expression counts as recently
+proposed by Kobak and Berens~\cite{Kobak2019}. In this context, we will refer
+to all genes with matrix entries set to zero as dropouts. Intuitively, if a
+gene has high mean expression over all cells, but is detected in only a
+handful of them (i.e. has high mean dropout rate), then this gene is likely
+specific to a specific cell-type and will serve as a good feature for any
+subsequent analysis where we wish to discriminate between cell types.
 
 More formally, given an expression matrix $\mathbf{X} \in \mathbb{R}^{N \times
 G}$ where $N$ is the number of cells and $G$ is the number of genes in the data
@@ -889,36 +921,5 @@ value of $b$ such that
 In this way, we are able to select a desired number of genes $\hat{G}$, which
 appear discriminative between cell types for the given gene-expression data set.
 
-\newpage
-
-\begin{figure}[htbp]
-  \includegraphics[width=\textwidth]{tasic_multiscale.pdf}
-  \caption{A comparison of standard and multi-scale t-SNE on data from the
-   mouse neocortex~\cite{Tasic2018}. {\bf (a)} Standard t-SNE using random
-   initialization places clusters arbitrarily. The resulting clustering
-   structure is not globally consistent, as clusters of the same type of
-   cells are dispersed throughout the landscape. Non-Neuronal clusters, for
-   instance, are mixed with clusters of GABAergic and Glutamaergic neurons.
-   {\bf (b)} By utilizing a globally consistent initialization for t-SNE, the
-   clusters are organized in a more meaningful layout, where clusters of
-   cells of the same type appear closer together.{\bf (c)} Augmenting t-SNE
-   with multi-scale similarities and using proper initialization provides a
-   more meaningful layout of the clusters. Non-Neuronal and Endothelial cell
-   types are now placed in the same region of the embedding. There are two
-   clear sub-groups of GABAergic neurons corresponding to their developmental
-   origins, which was not as apparent when using clever initialization
-   alone.}
-  \label{fig:multiscale}
-\end{figure}
-
-\begin{figure}[htbp]
-  \includegraphics[width=\textwidth]{hrvatin_embedding_tsne_genes.pdf}
-  \caption{Gene selection plays an important role when constructing the
-  reference embedding. {\bf (a)} Using too few genes results in fragmented
-  clusters. {\bf (b)} Using an intermediate number of genes reveals clustering
-  mostly consistent with cell annotations. {\bf (c)} Including all the genes
-  may lead to under-clustering of the more specialized cell types.}
-  \label{fig:gene_selection}
-\end{figure}
 
 \end{document}
