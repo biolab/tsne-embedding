@@ -8,15 +8,13 @@ All data used in the notebooks and figures are available at http://file.biolab.s
 
 ## Citation
 ```raw
-@article {Policar671404,
-  author = {Policar, Pavlin G. and Strazar, Martin and Zupan, Blaz},
+@article {Policar2021,
+  author = {Poli{\v{c}}ar, Pavlin G. and Stra{\v{z}}ar, Martin and Zupan, Bla{\v{z}}},
   title = {Embedding to Reference t-SNE Space Addresses Batch Effects in Single-Cell Classification},
-  elocation-id = {671404},
-  year = {2019},
-  doi = {10.1101/671404},
-  publisher = {Cold Spring Harbor Laboratory},
-  URL = {https://www.biorxiv.org/content/early/2019/06/14/671404},
-  eprint = {https://www.biorxiv.org/content/early/2019/06/14/671404.full.pdf},
-  journal = {bioRxiv}
+  journal = {Machine Learning},
+  pages = {1--20},
+  year = {2021},
+  publisher = {Springer},
+  doi = {10.1007/s10994-021-06043-1}
 }
 ```
