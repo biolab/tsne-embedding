@@ -56,8 +56,8 @@ Two-dimensional embeddings and their visualizations may assist in the analysis
 and interpretation of high-dimensional data. Intuitively, two data instances
 should be co-located in the resulting visualization if their multi-dimensional
 profiles are similar. For this task, non-linear embedding techniques such as
-t\nobreakdash -distributed stochastic neighbor embedding (t-SNE)~\cite{tsne} or
-uniform manifold approximation and projection~\cite{umap} have recently
+t\nobreakdash -distributed stochastic neighbor embedding (t-SNE)~\cite{Maaten2008} or
+uniform manifold approximation and projection~\cite{McInnes2018} have recently
 complemented traditional data transformation and embedding approaches such as
 principal component analysis (PCA) and multi-dimensional
 scaling~\cite{distill,umap_single_cell}. While useful for visualizing data from
@@ -69,7 +69,7 @@ data sources. This source-specific confounding is often referred to as {\em
 domain shift}~\cite{domain_shift}, {\em covariate shift}~\cite{covariate_shift}
 or {\em data set shift}~\cite{dataset_shift}. In bioinformatics, the
 domain-specific differences are more commonly referred to as {\em batch
-effects}~\cite{cca,mnn,seurat}.
+effects}~\cite{Butler2018,Haghverdi2018,Stuart2019}.
 
 Massive, multi-variate biological data sets often suffer from these
 source-specific biases.  The focus of this work is single-cell genomics, a
@@ -79,17 +79,17 @@ the result of isolating RNA molecules from individual cells, which serve as an
 estimate of the expression of cell's genes.  The studies can exceed thousands
 of cells and tens of thousands of genes, and typically start with cell type
 analysis. Here, it is expected that cells of the same type would cluster
-together in two-dimensional data visualization~\cite{seurat}. For instance,
+together in two-dimensional data visualization~\cite{Wolf2018}. For instance,
 Fig.~\ref{fig:batch_effect}.a shows t-SNE embedded data from mouse brain cells
-originating from the visual cortex~\cite{hrvatin2018} and the
-hypothalamus~\cite{chen2017}. The figure reveals distinct clusters but also
+originating from the visual cortex~\cite{Hrvatin2018} and the
+hypothalamus~\cite{Chen2017}. The figure reveals distinct clusters but also
 separates the data from the two brain regions. These two regions share the same
 cell types and --- contrary to the depiction in Fig.~\ref{fig:batch_effect}.a
 --- we would expect the data points from the two studies to overlap. Batch
 effects similarly prohibit the utility of t-SNE in the exploration of
 pancreatic cells in Fig.~\ref{fig:batch_effect}.b, which renders the data from
-a pancreatic cell atlas~\cite{baron2016} and similarly-typed cells from
-diabetic patients~\cite{xin2016}. Just like with data from brain cells,
+a pancreatic cell atlas~\cite{Baron2016} and similarly-typed cells from
+diabetic patients~\cite{Xin2016}. Just like with data from brain cells,
 pancreatic cells cluster primarily by data source, again resulting in a
 visualization driven by batch effects.
 
@@ -108,7 +108,7 @@ Current solutions to embedding the data from various data sources address the
 batch effect problems up-front. The data is typically preprocessed and
 transformed such that the batch effects are explicitly removed. Recently
 proposed procedures for batch effect removal include canonical correlation
-analysis~\cite{cca} and mutual nearest-neighbors~\cite{mnn,seurat}.  In these
+analysis~\cite{Butler2018} and mutual nearest-neighbors~\cite{Haghverdi2018,Stuart2019}.  In these
 works, batch effects are deemed removed when cells from different sources
 exhibit good mixing in a t-SNE visualization.  The elimination of batch effects
 may require aggressive data preprocessing which may blur the boundaries between
@@ -150,7 +150,7 @@ cell type correctly matches the prevailing type in reference clusters.
 
 The proposed solution implements a mapping of new data into an existing
 t-SNE visualization. While the utility of such an algorithm was already hinted
-at in recent publication~\cite{art_of_using_tsne}, we here provide its
+at in recent publication~\cite{Kobak2019}, we here provide its
 practical and theoretically-grounded implementation. Considering the abundance
 of recent publications on batch effect removal, we present surprising evidence
 that a computationally more direct and principled embedding procedure solves
@@ -241,7 +241,7 @@ impractical for large data sets. We adopt a recent approach
 for low-rank approximation of gradients based on polynomial interpolation which
 reduces its time complexity to $\mathcal{O}(N)$. This approximation
 enables the visualization of massive data sets, possibly containing millions of
-data points~\cite{fi_tsne}.
+data points~\cite{Linderman2019}.
 
 The resulting embeddings substantially depend on the value of the perplexity
 parameter. Perplexity can be interpreted as the number of neighbors for which
@@ -251,11 +251,11 @@ long-range interactions between clusters. Larger values may result in a more
 globally consistent visualizations --- preserving distances on a large scale
 and organizing clusters in a more meaningful way --- but can lead to merging
 small clusters and thus obscuring local aspects of the
-data~\cite{art_of_using_tsne}.
+data~\cite{Kobak2019}.
 
 The trade-off between the local organization and global consistency may be
 achieved by replacing the Gaussian kernels in Eq.~\ref{eq:gaussian_kernel} with
-a mixture of Gaussians of varying bandwidths~\cite{multiscale_tsne}.
+a mixture of Gaussians of varying bandwidths~\cite{Lee2015}.
 Multi-scale kernels are defined as
 
 \begin{equation}
@@ -268,13 +268,13 @@ $\sigma_{i,l}$ are selected in the same manner as in
 Eq.~\ref{eq:gaussian_kernel}, but with a different value of perplexity for each
 $l$. In our experiments, we used a mixture of two Gaussian kernels with
 perplexity values of 50 and 500. A similar formulation of
-multi-scale kernels was proposed in~\cite{art_of_using_tsne}, and we found the
+multi-scale kernels was proposed in~\cite{Kobak2019}, and we found the
 resulting embeddings are visually very similar to those obtained with the
 approach described above (not shown for brevity).
 
 When using t-SNE on larger data sets, the standard learning rate $\eta = 200$
 has been shown to lead to slower convergence and requires more iterations to
-achieve consistent embeddings~\cite{belkina2019automated}. We follow the
+achieve consistent embeddings~\cite{Belkina2019}. We follow the
 recommendation of Belkina \etal ~and use a higher learning rate $\eta = N / 12$
 when visualizing larger data sets.
 
@@ -316,7 +316,7 @@ $\mathbf{w}_j$ with respect to the loss (Eq.~\ref{eq:kl_divergence}) are:
 
 In the optimization step, we refine point positions using batch gradient
 descent. We use an adaptive learning rate scheme with momentum to speed up the
-convergence, as proposed by Jacobs~\cite{momentum,bh_tsne}. We run gradient
+convergence, as proposed by Jacobs~\cite{Jacobs1988,Maaten2014}. We run gradient
 descent with momentum $\alpha$ of $0.8$ for $250$ iterations, where the
 optimization converged in all our experiments. The time complexity needed to
 evaluate the gradients in Eq.~\ref{eq:gradient} is $\mathcal{O}(N \cdot M)$,
@@ -356,7 +356,7 @@ type. Our aim was to construct t-SNE visualizations where similarly-typed cells
 would cluster together, despite systematic differences between data sources. To
 that end, we focus on comparing different ways of using t-SNE rather than
 differences to embeddings like PCA or MDS, which have been substantially
-covered before~\cite{tsne,umap_single_cell}.  Below, we list the data sets,
+covered before~\cite{Maaten2008,Becht2019}.  Below, we list the data sets,
 describe single-cell specific data preprocessing procedures, and display the
 resulting data visualizations. Finally, we discuss the success of the proposed
 approach in alleviating the batch effects.
@@ -371,22 +371,22 @@ reference set (Table~\ref{tab:data sets}). The cells in the data sets
 originate from the following three tissues:
 
 \begin{description}
-\item[Mouse brain.] The data set from Hrvatin \etal~\cite{hrvatin2018} contains
+\item[Mouse brain.] The data set from Hrvatin \etal~\cite{Hrvatin2018} contains
 cells from the visual cortex exploring transcriptional changes after exposure
 to light. This was used as a reference for the data from Chen
-\etal~\cite{chen2017}, containing cells from the mouse hypothalamus and
+\etal~\cite{Chen2017}, containing cells from the mouse hypothalamus and
 their reaction to food deprivation. From the secondary data, we removed cells
 with no corresponding types in the reference: tanycytes, ependymal,
 epithelial, and unlabelled cells.
 
-\item[Human pancreas.] Baron \etal~\cite{baron2016} created
+\item[Human pancreas.] Baron \etal~\cite{Baron2016} created
 an atlas of pancreatic cell types. We used this set as a reference
-for data from Xin \etal~\cite{xin2016}, who examined transcriptional
+for data from Xin \etal~\cite{Xin2016}, who examined transcriptional
 differences between healthy and type 2 diabetic patients.
 
-\item[Mouse retina.] Macosko \etal~\cite{macosko2015} created
+\item[Mouse retina.] Macosko \etal~\cite{Macosko2015} created
 an atlas of mouse retinal cell types. We used this as a reference
-for the data from Shekhar \etal~\cite{shekhar2016}, who built an atlas for
+for the data from Shekhar \etal~\cite{Sekhar2016}, who built an atlas for
 retinal bipolar cells.
 \end{description}
 
@@ -412,7 +412,7 @@ Shekhar \etal & & Drop-seq & 27,499 & 5 & 96 \\
 relied on the quality control and annotations from the original publication
 and report the number of cell types after preprocessinng.  The cell
 annotations were made consistent to annotations from the Cell
-Ontology~\cite{cell_ontology}. Notice that different RNA sequencing protocols
+Ontology~\cite{Bard2005}. Notice that different RNA sequencing protocols
 were used to estimate gene expressions.}
 \label{tab:data sets}
 \end{table}
@@ -446,8 +446,8 @@ Fig.~\ref{fig:transform_brain}.b, or Figs.~\ref{fig:batch_effect}.b and
 
 \begin{figure}[htb]
   \includegraphics[width=\textwidth]{transform_pancreas.pdf}
-  \caption{Embedding of pancreatic cells from Baron \etal~\cite{baron2016} and
-  cells from the same tissue from Xin \etal~\cite{xin2016}. Just like in
+  \caption{Embedding of pancreatic cells from Baron \etal~\cite{Baron2016} and
+  cells from the same tissue from Xin \etal~\cite{Xin2016}. Just like in
   Fig.~\ref{fig:transform_brain}, the vast majority of the cells from the
   secondary data set were correctly mapped to the same-typed cluster of
   reference cells.}
@@ -458,24 +458,41 @@ Fig.~\ref{fig:transform_brain}.b, or Figs.~\ref{fig:batch_effect}.b and
 \begin{figure}[htb]
   \includegraphics[width=\textwidth]{transform_retina.pdf}
   \caption{An embedding of a large reference of retinal cells from Macosco
-  \etal~\cite{macosko2015} \textbf{(a)} and mapping of cells from a smaller study that
-  focuses on bipolar cells from Shekhar \etal~\cite{shekhar2016} \textbf{(b)}. We use
+  \etal~\cite{Macosko2015} \textbf{(a)} and mapping of cells from a smaller study that
+  focuses on bipolar cells from Shekhar \etal~\cite{Shekhar2016} \textbf{(b)}. We use
   colors consistent with the study by Macosko \etal}
   \label{fig:transform_retina}
 \end{figure}
 
 We use a number of additional, recently proposed modifications to enhance the t-SNE visualization of the reference data set.
 Kobak and Linderman have shown that the global consistency of embeddings produced by
-popular visualization algorithms are largely dependent on their initialization~\cite{kobak2019umap}. By utilizing PCA-based initialization, t-SNE is able to achieve
+popular visualization algorithms are largely dependent on their initialization~\cite{Kobak2019a}. By utilizing PCA-based initialization, t-SNE is able to achieve
 more meaningful layouts of the resulting clusters (Fig.~\ref{fig:multiscale}.b)
 as opposed to using randomly initialized embeddings (Fig.~\ref{fig:multiscale}.a).
 Another important extension is the use of multi-scale similarities, which, in addition
 to considering short range interactions, also models wider point neighborhoods. Coupled
 with PCA-based initializations, this produces even more meaningful visualizations where
 clusters form interpretable structures. For instance, consider Fig.~\ref{fig:multiscale}.c, which reveals two meaningful subgroups of GABAergic neurons, corresponding to their
-developmental origin, as discussed in Tasic \etal~\cite{tasic2018}, while this division
+developmental origin, as discussed in Tasic \etal~\cite{Tasic2018}, while this division
 is less apparent when using PCA-based initialization alone in
 Fig.~\ref{fig:multiscale}.b.
+
+\begin{figure}[htbp]
+  \includegraphics[width=\textwidth]{tasic_multiscale.pdf}
+  \caption{A comparison of standard and multi-scale t-SNE on data from the
+  mouse neocortex~\cite{Tasic2018}. {\bf (a)} Standard t-SNE using random 
+  initialization places clusters arbitrarily. The resulting clustering structure is not globally consistent,
+  as clusters of the same type of cells are dispersed throughout the landscape. Non-Neuronal clusters, for instance, are mixed with clusters of GABAergic and Glutamaergic neurons.
+  {\bf (b)} By utilizing a globally consistent initialization for t-SNE, the clusters
+  are organized in a more meaningful layout, where clusters of cells of the same type appear closer together.
+  {\bf (c)} Augmenting t-SNE with multi-scale
+  similarities and using proper initialization provides a more meaningful
+  layout of the clusters. Non-Neuronal and Endothelial cell types are now placed in
+  the same region of the embedding. There are two clear sub-groups of GABAergic
+  neurons corresponding to their developmental origins, which was not as apparent
+  when using clever initialization alone.}
+  \label{fig:multiscale}
+\end{figure}
 
 We also observed the important role of gene selection in crafting the reference
 embedding spaces. We found that when selecting an insufficient number of genes,
@@ -486,10 +503,20 @@ and may be intrinsic to single-cell data. In our studies, we found that
 selection of 3,000 genes yields most informative visualizations
 (Fig.~\ref{fig:gene_selection}).
 
+\begin{figure}[htbp]
+  \includegraphics[width=\textwidth]{hrvatin_embedding_tsne_genes.pdf}
+  \caption{Gene selection plays an important role when constructing the
+  reference embedding. {\bf (a)} Using too few genes results in fragmented
+  clusters. {\bf (b)} Using an intermediate number of genes reveals clustering
+  mostly consistent with cell annotations. {\bf (c)} Including all the genes
+  may lead to under-clustering of the more specialized cell types.}
+  \label{fig:gene_selection}
+\end{figure}
+
 In principle, our theoretically-grounded embedding of secondary data into the
 scaffold defined by the reference embedding could be simplified with the
 application of the nearest neighbors-based procedure. For example, while
-describing a set of tricks for t-SNE, Kobak and Berens~\cite{art_of_using_tsne}
+describing a set of tricks for t-SNE, Kobak and Berens~\cite{Kobak2019}
 proposed positioning new points into a known embedding by placing them in the
 median position of their 10 nearest neighbors, where the neighborhood was
 estimated in the original data space. Notice that we use this approach as well,
@@ -501,9 +528,9 @@ runtime (mouse retina example; 44,808 reference, 26,830 secondary cells,
 
 Fig.~\ref{fig:optimization} demonstrates a case where nearest neighbor-based 
 positioning alone is insufficient. We construct a reference embedding using only
-neurons from Hrvatin \etal~\cite{hrvatin2018} (Fig.~\ref{fig:optimization}.a)
+neurons from Hrvatin \etal~\cite{Hrvatin2018} (Fig.~\ref{fig:optimization}.a)
 and use that to position neuronal
-cells from the data set from Campbell \etal~\cite{campbell2017}. We utilize the
+cells from the data set from Campbell \etal~\cite{Campbell2017}. We utilize the
 weighted mean and median positions to initialize point positions from the secondary
 data set, as shown in Figs.~\ref{fig:optimization}.b and \ref{fig:optimization}.c.
 After initialization, we optimize point positions using the procedure described
@@ -524,9 +551,9 @@ indicating dissimilarity.
   \includegraphics[width=\textwidth]{optimization.pdf}
   \caption{Comparison of different initialization schemes for positioning new data
   points onto reference embeddings. {\bf (a)} We construct a reference embedding
-  using only neuronal subtypes from Hrvatin \etal~\cite{hrvatin2018}. {\bf (b)}
-  We position neuronal cells from Campbell \etal~\cite{campbell2017} using the
-  median initizaliation scheme from Kobak and Berens~\cite{art_of_using_tsne} and
+  using only neuronal subtypes from Hrvatin \etal~\cite{Hrvatin2018}. {\bf (b)}
+  We position neuronal cells from Campbell \etal~\cite{Campbell2017} using the
+  median initizaliation scheme from Kobak and Berens~\cite{Kobak2019} and
   run optimization for 500 iterations. Compare the optimized embedding with the 
   initial median initialization {\bf (c)} or by using a simple weighted mean
   initialization {\bf (d)}.}
@@ -538,11 +565,11 @@ present in the reference. The method may fail to reveal novel cell
 types in the secondary data set, possibly positioning them arbitrarily close to
 unrelated clusters. Procedures such as scmap were recently proposed to cope
 with such cases and identify the cells whose type is new and not included in
-the reference~\cite{scmap}.
+the reference~\cite{Kiselev2018}.
 
 Our procedure is, therefore, asymmetrical in the choice of reference and secondary data set.
 In practice, however, newly produced {\em secondary} data would be embedded into previously-prepared reference landscapes. Large collections of data {\em e.g.} the
-Human Cell Atlas initiative~\cite{hca} make it possible to scale up our approach to wider sets of cell types.
+Human Cell Atlas initiative~\cite{Rozenblatt-Rosen2017} make it possible to scale up our approach to wider sets of cell types.
 
 
 To quantitatively evaluate the predictive accuracy of the described procedure, we fit $k$-nearest neighbors classifiers on each reference t-SNE embedding from Figs.~\ref{fig:transform_brain}.a, \ref{fig:transform_pancreas}.a and \ref{fig:transform_retina}.a and use them to predict the cell types for the secondary data set embeddings from Figs.~\ref{fig:transform_brain}.b, \ref{fig:transform_pancreas}.b and \ref{fig:transform_retina}.b. The accuracy measures are reported in Table~\ref{tab:scores}. Our procedure of embedding new data points into two-dimensional t-SNE plane results in similar accuracy to approaches like random forests that use full compendium of cell-characterizing features. The results indicate that positioning of new cells onto a cell visualisation plane is not only indicative but also an accurate instrument for cell type characterization.
@@ -574,7 +601,7 @@ To quantitatively evaluate the predictive accuracy of the described procedure, w
   \label{tab:scores}
 \end{table}
 
-We compare our approach to two machine learning techniques, namely a $k$-nearest neighbor classifier (KNN) and a random forest ensemble, and scMap-Cluster~\cite{scmap}, a $k$-nearest neighbor based method, tailored explicitly to scRNA-seq data. scMap-Cluster uses three correlation-based distance measures and uses a voting scheme to perform classification. A threshold may also be set so that new cell types may be labeled as {\tt unrecognized}, but since our secondary data sets were chosen such that this does not happen, this was disabled. For the two machine learning approaches, we apply the typical single-cell preprocessing pipeline described in Sec.~\ref{sec:sc-pipeline}, i.e., library-size normalization, log-transformation, and select 1,000 most informative genes. Similarily to scMap-Cluster, we use the cosine distance to find the 5 nearest neighbors in the KNN model. We used 100 trees in the random forest ensemble. The models were fit on the reference data set, and no hyper-parameter tuning was performed.
+We compare our approach to two machine learning techniques, namely a $k$-nearest neighbor classifier (KNN) and a random forest ensemble, and scMap-Cluster~\cite{Kiselev2018}, a $k$-nearest neighbor based method, tailored explicitly to scRNA-seq data. scMap-Cluster uses three correlation-based distance measures and uses a voting scheme to perform classification. A threshold may also be set so that new cell types may be labeled as {\tt unrecognized}, but since our secondary data sets were chosen such that this does not happen, this was disabled. For the two machine learning approaches, we apply the typical single-cell preprocessing pipeline described in Sec.~\ref{sec:sc-pipeline}, i.e., library-size normalization, log-transformation, and select 1,000 most informative genes. Similarily to scMap-Cluster, we use the cosine distance to find the 5 nearest neighbors in the KNN model. We used 100 trees in the random forest ensemble. The models were fit on the reference data set, and no hyper-parameter tuning was performed.
 
 Surprisingly, both the random forest and $k$-nearest neighbor models outperform scMap-Cluster, which is specifically tailored to scRNA-seq data. However, these results may be skewed, as, in our examples, all the cell-types from the secondary data set were present in the reference data set. One of the core features of scMap-Cluster is the detection of novel cell types, which none of the other methods support. In other words, the other three methods would always assign a cell-type to a given cell, regardless of cell origin. Additionally, scMap-Cluster was primarily designed and tested on data sets produced by full-length sequencing protocols, which tend to detect a much higher number of molecules than other, sequencing protocols based on unique molecular identifiers (UMI). These two classes of sequencing protocols produce data sets with different sparsity and variance characteristics. This is consistent with the results in Table~\ref{tab:scores}, as only the data sets from the human pancreas, were produced using a full-length sequencing protocol, where scMap-Cluster achieves reasonably high accuracy.
 
@@ -627,10 +654,10 @@ to properly apply t-SNE. We use a standard single-cell preprocessing pipeline,
 consisting of the selection of 3,000 representative genes (see
 Sec.~\ref{sec:gene-selection}), library size normalization, log-transformation,
 standardization, and PCA-based representation that retains 50 principal
-components~\cite{seurat,scanpy}. To obtain the reference embedding, we apply
-multi-scale t-SNE using PCA initialization~\cite{art_of_using_tsne}. Due to
+components~\cite{Stuart2019,Wolf2018}. To obtain the reference embedding, we apply
+multi-scale t-SNE using PCA initialization~\cite{Kobak2019}. Due to
 high-dimensionality of the preprocessed input data we use cosine distance to
-estimate similarities between reference data points~\cite{Domingos2012-CACM}.
+estimate similarities between reference data points~\cite{Domingos2012}.
 When adding new data points from the secondary data set to the reference
 embedding, we select 1,000 genes present in both data sets and use the cosine
 similarity to estimate the similarities between the secondary data item and
@@ -646,7 +673,7 @@ Single-cell data sets suffer from high levels of technical noise and low
 capture efficiency, resulting in sparse expression matrices~\cite{umi}. To
 address this problem, we use a specialized feature-selection method, which
 exploits the mean-dropout relationship of expression counts as recently
-proposed by Kobak and Berens~\cite{art_of_using_tsne}. Here, genes with higher
+proposed by Kobak and Berens~\cite{Kobak2019}. Here, genes with higher
 than expected dropout rate are regarded as potential markers for cell
 subpopulations and are retained in the data.
 
@@ -672,32 +699,5 @@ such that
 \begin{equation}
 \sum_g I \left (d_g > \exp \left [ -(m_g - b) \right ] + 0.02 \right ) = \hat{G}.
 \end{equation}
-
-\begin{figure}[htbp]
-  \includegraphics[width=\textwidth]{tasic_multiscale.pdf}
-  \caption{A comparison of standard and multi-scale t-SNE on data from the
-  mouse neocortex~\cite{tasic2018}. {\bf (a)} Standard t-SNE using random 
-  initialization places clusters arbitrarily. The resulting clustering structure is not globally consistent,
-  as clusters of the same type of cells are dispersed throughout the landscape. Non-Neuronal clusters, for instance, are mixed with clusters of GABAergic and Glutamaergic neurons.
-  {\bf (b)} By utilizing a globally consistent initialization for t-SNE, the clusters
-  are organized in a more meaningful layout, where clusters of cells of the same type appear closer together.
-  {\bf (c)} Augmenting t-SNE with multi-scale
-  similarities and using proper initialization provides a more meaningful
-  layout of the clusters. Non-Neuronal and Endothelial cell types are now placed in
-  the same region of the embedding. There are two clear sub-groups of GABAergic
-  neurons corresponding to their developmental origins, which was not as apparent
-  when using clever initialization alone.}
-  \label{fig:multiscale}
-\end{figure}
-
-\begin{figure}[htbp]
-  \includegraphics[width=\textwidth]{hrvatin_embedding_tsne_genes.pdf}
-  \caption{Gene selection plays an important role when constructing the
-  reference embedding. {\bf (a)} Using too few genes results in fragmented
-  clusters. {\bf (b)} Using an intermediate number of genes reveals clustering
-  mostly consistent with cell annotations. {\bf (c)} Including all the genes
-  may lead to under-clustering of the more specialized cell types.}
-  \label{fig:gene_selection}
-\end{figure}
 
 \end{document}

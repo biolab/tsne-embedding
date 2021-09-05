@@ -5,7 +5,7 @@
 \documentclass[runningheads]{llncs}
 %
 \usepackage{graphicx}
-\usepackage{amsmath, amssymb}
+\usepackage{amsmath,amssymb}
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{hyperref}
@@ -28,12 +28,13 @@
 
 
 \begin{document}
+
 %
 \title{Embedding to Reference t-SNE Space Addresses Batch Effects in Single-Cell Classification}
 %
 \titlerunning{t-SNE Embedding and Batch Effects}
 %
-\author{Pavlin G. Poli\v{c}ar\inst{1} \and
+\author{Pavlin G. Poli\v{c}ar\inst{1,}\thanks{Corresponding author} \and
 Martin Stra\v{z}ar\inst{1} \and
 Bla\v{z} Zupan\inst{1,2}}
 %
@@ -218,16 +219,14 @@ or finding a joint lower-dimensional space, where batch effects are removed.
 Current methods broadly fall into two categories:
 \begin{enumerate}
 \item mutual nearest neighbor-based approaches aim to identify matching
- populations of cells across the data sets, using them to either find and
- correct the data sets~\cite{Haghverdi2018} or directly construct a
- batch-corrected k-nearest neighbor graph used in downstream analyses~\cite
- {Park2018}.
+ populations of cells across the data sets, using them to either find and correct the data sets~\cite{Haghverdi2018} or directly construct a
+ batch-corrected k-nearest neighbor graph used in downstream analyses~\cite{Park2018}.
 \item embedding multiple data sets into a joint lower-dimensional space, where
  batch effects are removed. Some of these approaches opt for linear
  dimensionality-reduction methods such as PCA~\cite{Korsunsky2019} or
  MultiCCA~\cite{Butler2018}, while others employ non-linear techniques from
  deep learning~\cite{Li2020,Lopez2018}. Still, other approaches use a
- combination of the two~\cite{Stuart2019,Hie2019}. Note that these approaches bear similarity with transfer learning~\cite{https://journalofbigdata.springeropen.com/articles/10.1186/s40537-016-0043-6}, which has also been used in domain adaptation~\cite{https://jieliu6.github.io/publication/conference-paper/jointly-embedding-multiple-single-cell/}.
+ combination of the two~\cite{Stuart2019,Hie2019}. Note that these approaches bear similarity with transfer learning~\cite{weiss2016survey}, which has also been used in domain adaptation~\cite{liu2019jointly}.
 \end{enumerate}
 
 Besides computational techniques, approaches for the removal of batch effects
@@ -507,7 +506,7 @@ Shekhar \etal & & Drop-seq & 27,499 & 5 & 96 \\
 \caption{Data sets used in our experiments. The first data set in each pair
 (Hrvatin \etal, Baron \etal, and Macosko \etal) was used as a reference.  We
 relied on the quality control and annotations from the original publication
-and report the number of cell types after prepossessing.  The cell
+and report the number of cell types after preprocessing.  The cell
 annotations were made consistent to annotations from the Cell
 Ontology~\cite{Bard2005}. Notice that different RNA sequencing protocols
 were used to estimate gene expressions.}
@@ -567,16 +566,11 @@ Fig.~\ref{fig:transform_brain}.b, or Figs.~\ref{fig:batch_effect}.b and
 We use a number of additional, recently proposed modifications to enhance the
 t-SNE visualization of the reference data set. Kobak and Linderman have shown
 that the global consistency of embeddings produced by popular visualization
-algorithms are largely dependent on their initialization~\cite
-{Kobak2019a}. By utilizing PCA-based initialization, t-SNE is able to achieve
-more meaningful layouts of the resulting clusters (Fig.~\ref
-{fig:multiscale}.b) as opposed to using randomly initialized embeddings
-(Fig.~\ref{fig:multiscale}.a). Another important extension is the use of
+algorithms are largely dependent on their initialization~\cite{Kobak2019a}. By utilizing PCA-based initialization, t-SNE is able to achieve more meaningful layouts of the resulting clusters (Fig.~\ref{fig:multiscale}.b) as opposed to using randomly initialized embeddings (Fig.~\ref{fig:multiscale}.a). Another important extension is the use of
 multi-scale similarities, which, in addition to considering short range
 interactions, also models wider point neighborhoods. Coupled with PCA-based
 initialization, this produces even more meaningful visualizations where
-clusters form interpretable structures. For instance, consider Fig.~\ref
-{fig:multiscale}.c, which reveals two meaningful subgroups of GABAergic
+clusters form interpretable structures. For instance, consider Fig.~\ref{fig:multiscale}.c, which reveals two meaningful subgroups of GABAergic
 neurons, corresponding to their developmental origin, as discussed in
 Tasic \etal~\cite{Tasic2018}, while this division is less apparent when using
 PCA-based initialization alone in Fig.~\ref{fig:multiscale}.b.
@@ -638,12 +632,10 @@ runtime (mouse retina example; 44,808 reference, 26,830 secondary cells,
 
 Fig.~\ref{fig:optimization} demonstrates a case where nearest neighbor-based
 positioning alone is insufficient. We construct a reference embedding using
-only neurons from Hrvatin \etal~\cite{Hrvatin2018} (Fig.~\ref
-{fig:optimization}.a) and use that to position neuronal cells from the data
+only neurons from Hrvatin \etal~\cite{Hrvatin2018} (Fig.~\ref{fig:optimization}.a) and use that to position neuronal cells from the data
 set from Campbell \etal~\cite{Campbell2017}. We utilize the weighted mean and
 median positions to initialize point positions from the secondary data set,
-as shown in Figs.~\ref{fig:optimization}.b and \ref
-{fig:optimization}.c. After initialization, we optimize point positions using
+as shown in Figs.~\ref{fig:optimization}.b and \ref{fig:optimization}.c. After initialization, we optimize point positions using
 the procedure described above for 500 iterations. The resulting
 visualizations from both initializations are visually very similar,
 indicating stable convergence. We show one of the resulting visualizations in
@@ -663,8 +655,7 @@ dissimilarity.
   \includegraphics[width=\textwidth]{optimization.pdf}
   \caption{Comparison of different initialization schemes for positioning new
    data points onto reference embeddings. {\bf (a)} We construct a reference
-   embedding using only neuronal subtypes from Hrvatin \etal~\cite
-   {Hrvatin2018}. {\bf (b)} We position neuronal cells from
+   embedding using only neuronal subtypes from Hrvatin \etal~\cite{Hrvatin2018}. {\bf (b)} We position neuronal cells from
    Campbell \etal~\cite{Campbell2017} using the median initialization scheme
    from Kobak and Berens~\cite{Kobak2019} and run optimization for 500
    iterations. Compare the optimized embedding with the initial median
@@ -688,8 +679,7 @@ heavily on the chosen preprocessing pipeline.
 We illustrate this with Fig.~\ref{fig:incomplete_reference}, where we first fit
 create a reference embedding containing only neuronal cells from Hrvatin
 \etal~\cite{Hrvatin2018}. We then select only non-neuronal cells from Campbell
-\etal~\cite{Campbell2017} and add them to the reference embedding in Fig.~\ref
-{fig:incomplete_reference}.b. The non-neuronal cells from Hrvatin \etal are
+\etal~\cite{Campbell2017} and add them to the reference embedding in Fig.~\ref{fig:incomplete_reference}.b. The non-neuronal cells from Hrvatin \etal are
 scattered somewhat arbitrarily around several clusters in the reference
 embedding. Interestingly, the secondary data points form a ``ring'' around
 one of the clusters, indicating that these data points are very different
@@ -707,7 +697,7 @@ unknown cell types~\cite{Kiselev2018}.
 
 \begin{figure}[htb]
   \includegraphics[width=\textwidth]{incomplete_reference-brain.pdf}
-  \caption{A reference embedding must contain all the cell types in the secondary embedding to produce reliable results. {\bf (a)} We construct a reference embedding containing only neuronal cells from Hrvatin \etal~\cite {Hrvatin2018}. {\bf (b)} We select only non-neuronal cells from Campbell \etal~\cite{Campbell2017} so that no overlap exists between the cell types between the data sets. Conceptually, t-SNE behaves similarly to a $k$-NN classifier and places the non-neuronal cells to their most similar points in the reference. In some instances, the non-neuronal cells are sufficiently different from the neuronal cells so that they are repelled from the reference clusters. Such behavior results in the ``ring'' seen on the right-hand side of the embedding.} \label{fig:incomplete_reference}
+  \caption{A reference embedding must contain all the cell types in the secondary embedding to produce reliable results. {\bf (a)} We construct a reference embedding containing only neuronal cells from Hrvatin \etal~\cite{Hrvatin2018}. {\bf (b)} We select only non-neuronal cells from Campbell \etal~\cite{Campbell2017} so that no overlap exists between the cell types between the data sets. Conceptually, t-SNE behaves similarly to a $k$-NN classifier and places the non-neuronal cells to their most similar points in the reference. In some instances, the non-neuronal cells are sufficiently different from the neuronal cells so that they are repelled from the reference clusters. Such behavior results in the ``ring'' seen on the right-hand side of the embedding.} \label{fig:incomplete_reference}
 \end{figure}
 
 Our procedure is, therefore, asymmetrical in the choice of reference and
@@ -887,8 +877,7 @@ The preprocessing stages are detailed in accompanying Python notebooks
 \section{Gene Selection\label{sec:gene-selection}}
 
 Single-cell data sets suffer from high levels of technical noise and low
-capture efficiency, resulting in sparse and noisy expression matrices~\cite
-{umi}. A common occurrence in these data sets is ``dropout'', where an
+capture efficiency, resulting in sparse and noisy expression matrices~\cite{umi}. A common occurrence in these data sets is ``dropout'', where an
 expressed gene is not measured, and its corresponding matrix entry is set to
 zero. To address this problem, we use a specialized feature-selection method,
 which exploits the mean-dropout relationship of expression counts as recently
