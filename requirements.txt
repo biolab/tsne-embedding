@@ -1,0 +1,6 @@
+numpy
+pandas
+opentsne
+anndata
+matplotlib
+scanpy
